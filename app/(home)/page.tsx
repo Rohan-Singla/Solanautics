@@ -1,7 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "./components/Hero";
 import DashPreview from "./components/Dash-Preview";
-import CTA from "./components/CTA";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -13,7 +12,6 @@ export default function Home() {
         <main className="flex-1">
           <Hero />
           <DashPreview/>
-          <CTA/>
         </main>
         <Footer/>
       </div>
