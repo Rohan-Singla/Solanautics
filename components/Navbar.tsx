@@ -20,9 +20,14 @@ const Navbar = () => {
                         Pricing
                     </Link>
                 </nav>
-                <Button variant="secondary" className="cursor-pointer">
-                    Sign In
-                </Button>
+                <div>
+                    <Button variant="outline" className="cursor-pointer bg-transparent text-white border border-white mr-5 hover:bg-gray-900 hover:text-white">
+                        Sign In
+                    </Button>
+                    <Button variant="secondary" className="cursor-pointer">
+                        Sign up
+                    </Button>
+                </div>
             </div>
         </header>
     )
