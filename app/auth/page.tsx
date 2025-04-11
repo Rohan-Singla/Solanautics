@@ -90,82 +90,83 @@ export default function MinimalAuth() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-black p-4">
-            <div className="w-full max-w-sm">
-                <div className="flex mb-8 justify-center space-x-8">
-                    <button
-                        onClick={() => setIsSignUp(true)}
-                        className={cn(
-                            "text-md font-medium pb-1 transition-all cursor-pointer",
-                            isSignUp ? "text-orange-500 border-b-2 border-orange-500" : "text-zinc-400 hover:text-zinc-300",
-                        )}
-                    >
-                        SIGN UP
-                    </button>
-                    <h3 className="text-white">OR</h3>
-                    <button
-                        onClick={() => setIsSignUp(false)}
-                        className={cn(
-                            "text-md font-medium pb-1 transition-al cursor-pointer",
-                            !isSignUp ? "text-orange-500 border-b-2 border-orange-500" : "text-zinc-400 hover:text-zinc-300",
-                        )}
-                    >
-                        SIGN IN
-                    </button>
-                </div>
-
-                <div className="bg-zinc-900 p-8 rounded-lg">
-                    <h1 className="text-xl font-medium text-white mb-8">{isSignUp ? "Create account" : "Welcome back"}</h1>
-
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        {isSignUp && (
-                            <div className="space-y-2">
-                                <label htmlFor="username" className="text-sm text-zinc-400 font-medium pb-3">
-                                    Username
-                                </label>
-                                <Input
-                                    id="username"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="bg-zinc-800 border-zinc-700 text-white focus:border-orange-500 focus:ring-orange-500"
-                                    placeholder="Enter username"
-                                />
-                            </div>
-                        )}
-
+        <div className="w-full max-w-sm">
+            <div className="flex mb-8 justify-center space-x-8">
+                <button
+                    onClick={() => setIsSignUp(true)}
+                    className={cn(
+                        "text-md font-medium pb-1 transition-all cursor-pointer",
+                        isSignUp ? "text-blue-500 border-b-2 border-blue-500" : "text-zinc-400 hover:text-zinc-300",
+                    )}
+                >
+                    SIGN UP
+                </button>
+                <h3 className="text-white">OR</h3>
+                <button
+                    onClick={() => setIsSignUp(false)}
+                    className={cn(
+                        "text-md font-medium pb-1 transition-al cursor-pointer",
+                        !isSignUp ? "text-blue-500 border-b-2 border-blue-500" : "text-zinc-400 hover:text-zinc-300",
+                    )}
+                >
+                    SIGN IN
+                </button>
+            </div>
+    
+            <div className="bg-zinc-900 p-8 rounded-lg">
+                <h1 className="text-xl font-medium text-white mb-8">{isSignUp ? "Create account" : "Welcome back"}</h1>
+    
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {isSignUp && (
                         <div className="space-y-2">
-                            <label className="text-sm text-zinc-400 font-medium pb-3">Wallet</label>
-                            <Button
-                                type="button"
-                                onClick={() => openConnectModal?.()}
-                                disabled={isConnecting || isWalletConnected}
-                                variant="outline"
-                                className={cn(
-                                    "w-full cursor-pointer justify-start h-10 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 hover:text-white text-left font-normal text-white",
-                                    isWalletConnected && "border-orange-500/50 text-orange-500 cursor-pointer",
-                                )}
-                            >
-                                <Wallet className="mr-2 h-4 w-4" />
-                                {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Connect Wallet'}
-                            </Button>
-                            {isWalletConnected && <p className="text-xs text-zinc-500 truncate mt-1">{walletAddress}</p>}
+                            <label htmlFor="username" className="text-sm text-zinc-400 font-medium pb-3">
+                                Username
+                            </label>
+                            <Input
+                                id="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="bg-zinc-800 border-zinc-700 text-white focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter username"
+                            />
                         </div>
-
-                        <Button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-black font-medium mt-3 cursor-pointer">
-                            {isSignUp ? "Create account" : "Sign in"}
+                    )}
+    
+                    <div className="space-y-2">
+                        <label className="text-sm text-zinc-400 font-medium pb-3">Wallet</label>
+                        <Button
+                            type="button"
+                            onClick={() => openConnectModal?.()}
+                            disabled={isConnecting || isWalletConnected}
+                            variant="outline"
+                            className={cn(
+                                "w-full cursor-pointer justify-start h-10 bg-zinc-800 border-zinc-700 hover:bg-zinc-700 hover:text-white text-left font-normal text-white",
+                                isWalletConnected && "border-blue-500/50 text-blue-500 cursor-pointer",
+                            )}
+                        >
+                            <Wallet className="mr-2 h-4 w-4" />
+                            {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Connect Wallet'}
                         </Button>
-                    </form>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-md text-zinc-500">
-                            {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
-                            <button onClick={() => setIsSignUp(!isSignUp)} className="text-orange-500 hover:text-orange-400">
-                                {isSignUp ? "Sign in" : "Sign up"}
-                            </button>
-                        </p>
+                        {isWalletConnected && <p className="text-xs text-zinc-500 truncate mt-1">{walletAddress}</p>}
                     </div>
+    
+                    <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-black font-medium mt-3 cursor-pointer">
+                        {isSignUp ? "Create account" : "Sign in"}
+                    </Button>
+                </form>
+    
+                <div className="mt-6 text-center">
+                    <p className="text-md text-zinc-500">
+                        {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
+                        <button onClick={() => setIsSignUp(!isSignUp)} className="text-blue-500 hover:text-blue-400">
+                            {isSignUp ? "Sign in" : "Sign up"}
+                        </button>
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
+    
     )
 }
 
