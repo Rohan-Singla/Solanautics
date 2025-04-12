@@ -2,6 +2,7 @@ import Hero from "./components/Hero";
 import DashPreview from "./components/Features";
 import Howitworks from "./components/Howit-works";
 import Upcomingplans from "./components/Upcoming-plans";
+import Meetteam from "./components/Meet-team";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
           <DashPreview/>
           <Howitworks/>
           <Upcomingplans/>
+          <Meetteam/>
         </main>
       </div>
     </>
