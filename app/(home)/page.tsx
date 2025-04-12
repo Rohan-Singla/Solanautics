@@ -1,5 +1,7 @@
 import Hero from "./components/Hero";
 import DashPreview from "./components/Features";
+import Howitworks from "./components/Howit-works";
+import Upcomingplans from "./components/Upcoming-plans";
 
 export default function Home() {
   return (
@@ -8,6 +10,8 @@ export default function Home() {
         <main className="flex-1">
           <Hero />
           <DashPreview/>
+          <Howitworks/>
+          <Upcomingplans/>
         </main>
       </div>
     </>
