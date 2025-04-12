@@ -56,9 +56,9 @@ const DashPreview = () => {
               <div className="mb-4 h-12 w-12 rounded-full bg-gradient-to-br from-pink-500 to-pink-700 p-3">
                 <div className="h-full w-full rounded-full bg-pink-400/30" ><TrendingUp /></div>
               </div>
-              <h3 className="mb-2 text-xl font-bold">Market Predictions</h3>
+              <h3 className="mb-2 text-xl font-bold">Price Alerts</h3>
               <p className="text-white/70">
-                AI-powered analysis of on-chain data to predict market movements before they happen.
+                Real time price $SOL Price tracking , get alerts and notifications to don't miss on opportunities.
               </p>
             </motion.div>
 
@@ -74,7 +74,7 @@ const DashPreview = () => {
               </div>
               <h3 className="mb-2 text-xl font-bold">Token Intelligence</h3>
               <p className="text-white/70">
-                Discover emerging tokens before they pump with advanced liquidity analysis.
+                A real-time dashboard that tracks liquidity pools and gives notifications for sudden movements.
               </p>
             </motion.div>
           </div>

@@ -1,5 +1,5 @@
 import Hero from "./components/Hero";
-import DashPreview from "./components/Dash-Preview";
+import DashPreview from "./components/Features";
 
 export default function Home() {
   return (
