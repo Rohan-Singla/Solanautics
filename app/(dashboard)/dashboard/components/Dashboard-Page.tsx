@@ -16,7 +16,7 @@ export function DashboardPage() {
   const [activeTab, setActiveTab] = useState("leaderboard")
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+    <div className="flex min-h-screen bg-black">
       {!isMobile && <SideNav activeTab={activeTab} setActiveTab={setActiveTab} />}
 
       <div className="flex-1">
@@ -34,32 +34,6 @@ export function DashboardPage() {
               </SheetContent>
             </Sheet>
           )}
-
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-blue-600">
-              <span className="text-sm font-bold text-white">SW</span>
-            </div>
-            {!isMobile && <h1 className="text-lg font-bold text-white">Solana Whale Tracker</h1>}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Input
-                placeholder="Search wallets..."
-                className="w-full rounded-full border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-300 placeholder-gray-500 focus:border-purple-500 md:w-64"
-              />
-            </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-purple-500"></span>
-              <span className="sr-only">Notifications</span>
-            </Button>
-            <Button variant="ghost" className="hidden items-center gap-2 md:flex">
-              <div className="h-6 w-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
-              <span>Connect Wallet</span>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </div>
         </header>
 
         <main className="px-4 py-6 md:px-6">

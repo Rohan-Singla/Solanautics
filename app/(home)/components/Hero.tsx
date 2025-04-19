@@ -20,7 +20,7 @@ const Hero = () => {
                                 Track Smart Money <span className="text-cyan-400">Movements</span> in Real-Time
                             </h1>
                             <p className="max-w-[600px] text-zinc-400 md:text-xl">
-                                A real-time dashboard & alert bot that detects liquidity manipulations and alerts traders when
+                                A real-time dashboard & alert bot that tracks and detects liquidity manipulations , whales , SOL price and alerts traders when
                                 opportunities or risks arise on <b>Solana</b> .
                             </p>
                         </div>

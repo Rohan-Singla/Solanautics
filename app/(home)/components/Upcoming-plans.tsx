@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowRight, Calendar } from 'lucide-react'
+import {  Calendar } from 'lucide-react'
 import React from 'react'
 
 const Upcomingplans = () => {
@@ -90,12 +89,6 @@ const Upcomingplans = () => {
                         </div>
                     ))}
                 </div>
-            </div>
-
-            <div className="mt-12 text-center">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                    View Full Roadmap <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
             </div>
         </section>
     )

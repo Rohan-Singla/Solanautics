@@ -3,19 +3,23 @@ import DashPreview from "./components/Features";
 import Howitworks from "./components/Howit-works";
 import Upcomingplans from "./components/Upcoming-plans";
 import Meetteam from "./components/Meet-team";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
     <>
+      <Navbar />
       <div className="flex min-h-screen flex-col bg-black text-white w-full">
         <main className="flex-1">
           <Hero />
-          <DashPreview/>
-          <Howitworks/>
-          <Upcomingplans/>
-          <Meetteam/>
+          <DashPreview />
+          <Howitworks />
+          <Upcomingplans />
+          <Meetteam />
         </main>
       </div>
+      <Footer />
     </>
   );
 }

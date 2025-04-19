@@ -17,18 +17,19 @@ const Navbar = () => {
                         Features
                     </Link>
                     <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
-                        Pricing
+                        How it Works
+                    </Link>
+                    <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
+                        Upcoming Plans
+                    </Link>
+                    <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
+                        Team
                     </Link>
                 </nav>
                 <div>
-                    <Link href={"/auth"}>
-                        <Button variant="outline" className="cursor-pointer bg-transparent text-white border border-white mr-5 hover:bg-gray-900 hover:text-white">
-                            Sign In
-                        </Button>
-                    </Link >
-                    <Link href={"/auth"}>
+                    <Link href={"/dashboard"}>
                         <Button variant="secondary" className="cursor-pointer">
-                            Sign up
+                            Dashboard
                         </Button>
                     </Link>
                 </div>

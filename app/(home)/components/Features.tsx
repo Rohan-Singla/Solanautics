@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Brain, Fish, TrendingUp } from 'lucide-react'
+import { DollarSign, Fish, TrendingUp } from 'lucide-react'
 
 const DashPreview = () => {
   return (
@@ -70,9 +70,9 @@ const DashPreview = () => {
               className="rounded-lg border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
             >
               <div className="mb-4 h-12 w-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 p-3">
-                <div className="h-full w-full rounded-full bg-purple-400/50" ><Brain /></div>
+                <div className="h-full w-full rounded-full bg-purple-400/50" ><DollarSign /></div>
               </div>
-              <h3 className="mb-2 text-xl font-bold">Token Intelligence</h3>
+              <h3 className="mb-2 text-xl font-bold">Liquidity Pools Tracking</h3>
               <p className="text-white/70">
                 A real-time dashboard that tracks liquidity pools and gives notifications for sudden movements.
               </p>

@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { QueryProviders } from "@/components/providers/QueryProvider";
-import { Providers } from "@/components/providers/Rainbow-Provider";
 import { Toaster } from "react-hot-toast";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const geistSans = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800"]
@@ -28,12 +25,8 @@ export default function RootLayout({
         className={`${geistSans.className} antialiased`}
       >
         <QueryProviders>
-          <Navbar/>
-          <Providers>
-            <Toaster position="bottom-right"/>
-            {children}
-          </Providers>
-          <Footer/>
+          <Toaster position="bottom-right" />
+          {children}
         </QueryProviders>
       </body>
     </html>

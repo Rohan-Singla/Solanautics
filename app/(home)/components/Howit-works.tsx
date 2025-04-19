@@ -12,13 +12,13 @@ const Howitworks = () => {
         },
         {
             icon: <Code className="h-10 w-10 text-blue-400" />,
-            title: "Smart Contracts",
-            description: "Secure and audited smart contracts powering our decentralized applications and services.",
+            title: "SolScan API",
+            description: "Uses Solscan.io API to get relevant data for tracking and to send alerts.",
         },
         {
             icon: <Zap className="h-10 w-10 text-blue-400" />,
-            title: "Web3 Integration",
-            description: "Seamless integration with Web3 wallets and services for a smooth user experience.",
+            title: "Realtime tracking",
+            description: "Real time tracking of whales,liquidity pools,Solana price to give you alerts and notifications at right time.",
         },
     ]
     return (
