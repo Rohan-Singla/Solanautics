@@ -1,28 +1,43 @@
+// lib/telegram-bot.ts
+
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 import { prisma } from './prisma';
 
-// Get the token from env
 const token = process.env.TELEGRAM_BOT_TOKEN!;
 const bot = new TelegramBot(token, { polling: true });
 
-// Listen for /start command
-bot.onText(/\/start/, async (msg:Message) => {
+bot.onText(/\/start/, async (msg: Message) => {
   const chatId = msg.chat.id.toString();
+  const userId = chatId; // We're treating Telegram chatId as userId in this setup
 
-  // Optional: Save chat ID to DB if not already saved
-  const existing = await prisma.priceAlert.findFirst({ where: { userId: chatId } });
-  if (!existing) {
-    await prisma.priceAlert.create({
+  // 1. Save chat ID to TelegramChat model if not exists
+  const existingChat = await prisma.telegramChat.findUnique({ where: { chatId } });
+
+  if (!existingChat) {
+    await prisma.telegramChat.create({
       data: {
-        userId: chatId,
-        type: 'Welcome',
-        threshold: 0,
+        userId,
+        chatId,
       },
     });
   }
 
-  // Reply to user
-  bot.sendMessage(chatId, `👋 Hey ${msg.chat.first_name || 'friend'}! You're now connected with our alert bot. Stay tuned for updates!`);
+  // 2. Link this chatId to any existing alerts without chatId
+  await prisma.priceAlert.updateMany({
+    where: {
+      userId,
+      chatId: null,
+    },
+    data: {
+      chatId,
+    },
+  });
+
+  // 3. Send confirmation
+  bot.sendMessage(
+    chatId,
+    `🚀 You're now connected to Solanautics Alerts! We'll notify you when any of your alert conditions are triggered.`
+  );
 });
 
 export { bot };

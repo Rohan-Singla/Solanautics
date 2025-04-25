@@ -16,6 +16,7 @@ export function DashboardPage_priceAlerts() {
   const isMobile = useMobile();
   const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedAlert, setSelectedAlert] = useState<AlertType>(null);
+  const [showTelegramPrompt, setShowTelegramPrompt] = useState(false);
 
   const handleFormSubmit = async (data: any) => {
     const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
@@ -33,8 +34,8 @@ export function DashboardPage_priceAlerts() {
 
     const payload = {
       ...data,
-      userId: 'user123', // ✅ TEMP hardcoded user for now
-        };
+      userId: 'user123', // TEMP hardcoded
+    };
 
     try {
       console.log('🌐 Fetching from:', endpoint);
@@ -54,7 +55,12 @@ export function DashboardPage_priceAlerts() {
 
       const result = await response.json();
       console.log('✅ API Response:', result);
+      console.log("Telegram link received:", result.telegramLink);
       alert('✅ Alert set successfully!');
+
+      // 👇 Show Telegram banner
+      setShowTelegramPrompt(true);
+      setTimeout(() => setShowTelegramPrompt(false), 10000); // Auto-hide after 10 sec
     } catch (error) {
       console.error('❌ Error submitting alert:', error);
       alert('❌ Failed to set alert.');
@@ -91,6 +97,29 @@ export function DashboardPage_priceAlerts() {
         </header>
 
         <main className="px-4 py-6 md:px-6 space-y-6">
+          {showTelegramPrompt && (
+            <div className="bg-cyan-800/20 border border-cyan-700 p-4 rounded-lg text-white flex justify-between items-center">
+              <p>
+                🚀 You're all set! Now,{' '}
+                <a
+                  href="https://t.me/Solanautics_Alerts_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold"
+                >
+                  start the Telegram bot
+                </a>{' '}
+                to get your alert notifications.
+              </p>
+              <button
+                onClick={() => setShowTelegramPrompt(false)}
+                className="ml-4 text-gray-300 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           <div className="flex items-center">
             <span className="bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
               SOL Price: {solPrice}

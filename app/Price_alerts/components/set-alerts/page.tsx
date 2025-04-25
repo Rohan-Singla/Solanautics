@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import React, { useState } from 'react';
@@ -31,6 +29,7 @@ type AlertFormData = PriceAlertData | VolatilityAlertData | RangeAlertData;
 
 const SetAlertsPage = () => {
   const [selectedAlert, setSelectedAlert] = useState<AlertType>(null);
+  const [showTelegramPrompt, setShowTelegramPrompt] = useState(false); // State for showing Telegram prompt
 
   const handleFormSubmit = async (data: AlertFormData) => {
     const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
@@ -66,6 +65,9 @@ const SetAlertsPage = () => {
       const result = await res.json();
       console.log('✅ API Response:', result);
       alert('Alert created successfully!');
+      
+      // Show the Telegram prompt after alert creation
+      setShowTelegramPrompt(true);
     } catch (err) {
       console.error('❌ Error:', err);
       alert('Failed to create alert.');
@@ -130,6 +132,23 @@ const SetAlertsPage = () => {
               onSubmit={handleFormSubmit}
             />
           </div>
+        </div>
+      )}
+
+      {/* Show Telegram prompt after alert creation */}
+      {showTelegramPrompt && (
+        <div className="mt-4 bg-green-800/30 border border-green-500 text-green-300 p-4 rounded-lg text-sm">
+          ✅ Alert set successfully! Now connect with our Telegram bot for real-time alerts. <br />
+          👉{' '}
+          <a
+            href="https://t.me/Solanautics_Alerts_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-semibold text-green-400"
+          >
+            Click here to start the bot
+          </a>{' '}
+          and press <strong>/start</strong> to activate alerts!
         </div>
       )}
     </section>

@@ -21,7 +21,14 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: 'Range alert created successfully', alert }, { status: 201 });
+    // Add the Telegram bot link here
+    const telegramBotLink = 'https://t.me/Solanautics_Alerts_bot';
+
+    return NextResponse.json({ 
+      message: 'Range alert created successfully', 
+      alert,
+      telegramLink: telegramBotLink  // Include Telegram link in response
+    }, { status: 201 });
 
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Something went wrong' }, { status: 500 });

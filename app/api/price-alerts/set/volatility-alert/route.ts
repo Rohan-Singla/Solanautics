@@ -53,7 +53,15 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: 'Volatility alert created successfully', alert }, { status: 201 });
+    // Add the Telegram bot link here
+    const telegramBotLink = 'https://t.me/Solanautics_Alerts_bot';
+    console.log("Generated telegram link:", telegramBotLink);
+
+    return NextResponse.json({ 
+      message: 'Volatility alert created successfully', 
+      alert,
+      telegramLink: 'https://t.me/Solanautics_Alerts_bot' // Include Telegram link in response
+    }, { status: 201 });
 
   } catch (err: any) {
     console.error('❌ Error in volatility route:', err);

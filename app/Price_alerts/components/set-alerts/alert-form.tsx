@@ -31,47 +31,55 @@ const AlertForm: React.FC<AlertFormProps> = ({ type, onClose, onSubmit }) => {
   const [threshold, setThreshold] = useState('');
   const [rangeMin, setRangeMin] = useState('');
   const [rangeMax, setRangeMax] = useState('');
+  const [showTelegramPrompt, setShowTelegramPrompt] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (type === 'Range') {
-      const min = parseFloat(rangeMin);
-      const max = parseFloat(rangeMax);
-      if (min >= max) {
-        alert('Min price should be less than max price.');
-        return;
+    try {
+      if (type === 'Range') {
+        const min = parseFloat(rangeMin);
+        const max = parseFloat(rangeMax);
+        if (min >= max) {
+          alert('Min price should be less than max price.');
+          return;
+        }
+        onSubmit({
+          type: 'Range',
+          minPrice: min,
+          maxPrice: max,
+        });
       }
 
-      onSubmit({
-        type: 'Range',
-        minPrice: min,
-        maxPrice: max,
-      });
-    }
-
-    if (type === 'Volatility') {
-      onSubmit({
-        type: 'Volatility',
-        mode: 'default',
-        tokenAddress: SOL_TOKEN_ADDRESS,
-      });
-    }
-
-    if (type === 'Price') {
-      const price = parseFloat(threshold);
-      if (price <= 0) {
-        alert('Price must be greater than 0.');
-        return;
+      if (type === 'Volatility') {
+        onSubmit({
+          type: 'Volatility',
+          mode: 'default',
+          tokenAddress: SOL_TOKEN_ADDRESS,
+        });
       }
 
-      onSubmit({
-        type: 'Price',
-        threshold: price,
-      });
+      if (type === 'Price') {
+        const price = parseFloat(threshold);
+        if (price <= 0) {
+          alert('Price must be greater than 0.');
+          return;
+        }
+
+        onSubmit({
+          type: 'Price',
+          threshold: price,
+        });
+      }
+
+      // ✅ Show Telegram link after successful submission
+      setShowTelegramPrompt(true);
+      console.log("Show telegram prompt:", showTelegramPrompt);
+    } catch {
+      alert('Something went wrong while setting alert.');
     }
 
-    onClose();
+    onClose(); // keep this if you still want modal to close instantly
   };
 
   return (
@@ -151,6 +159,22 @@ const AlertForm: React.FC<AlertFormProps> = ({ type, onClose, onSubmit }) => {
           Cancel
         </button>
       </div>
+
+      {showTelegramPrompt && (
+        <div className="mt-4 bg-green-800/30 border border-green-500 text-green-300 p-4 rounded-lg text-sm">
+          ✅ Alert set successfully! Now connect with our Telegram bot for real-time alerts. <br />
+          👉{' '}
+          <a
+            href="https://t.me/Solanautics_Alerts_bot"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-semibold text-green-400"
+          >
+            Click here to start the bot
+          </a>{' '}
+          and press <strong>/start</strong> to activate alerts!
+        </div>
+      )}
     </form>
   );
 };
