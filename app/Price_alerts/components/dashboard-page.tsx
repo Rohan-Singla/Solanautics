@@ -1,29 +1,75 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { SideNav_price_alert } from "./side-nav";
-import { StatCard_price_alert } from "./stats-card";
-import { Leaderboard_price_alerts } from "./leaderboard-tokens";
-import { useMobile } from "@/hooks/use-mobile";
-import { LiveDataCard_price_alert } from "./live-data"; // ✅ NEW IMPORT
-import LiveChart from "./live-chart"; // ✅ Updated Import
+import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { SideNav_price_alert } from './side-nav';
+import { useMobile } from '@/hooks/use-mobile';
+import { LiveDataCard_price_alert } from './live-data';
+import { FaBell } from 'react-icons/fa';
+import AlertForm from './set-alerts/alert-form';
+
+type AlertType = 'Price' | 'Volatility' | 'Range' | null;
 
 export function DashboardPage_priceAlerts() {
   const isMobile = useMobile();
-  const [activeTab, setActiveTab] = useState("leaderboard");
+  const [activeTab, setActiveTab] = useState('leaderboard');
+  const [selectedAlert, setSelectedAlert] = useState<AlertType>(null);
 
-  const solPrice = "$158.34";
-  const solPriceChange = "+2.5%";
+  const handleFormSubmit = async (data: any) => {
+    const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
+    if (!token) {
+      console.error('Solscan API token is missing');
+      return;
+    }
+
+    const endpoint =
+      selectedAlert === 'Volatility'
+        ? '/api/price-alerts/set/volatility-alert'
+        : selectedAlert === 'Price'
+        ? '/api/price-alerts/set/price-alert'
+        : '/api/price-alerts/set/range-alert';
+
+    const payload = {
+      ...data,
+      userId: 'user123', // ✅ TEMP hardcoded user for now
+        };
+
+    try {
+      console.log('🌐 Fetching from:', endpoint);
+      console.log('📦 Payload:', data);
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to submit alert: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ API Response:', result);
+      alert('✅ Alert set successfully!');
+    } catch (error) {
+      console.error('❌ Error submitting alert:', error);
+      alert('❌ Failed to set alert.');
+    }
+  };
+
+  const solPrice = '$158.34'; // Replace with live data if needed
 
   return (
     <div className="flex min-h-screen bg-black text-white">
-      {!isMobile && <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />}
+      {!isMobile && (
+        <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
+      )}
 
       <div className="flex-1">
-        {/* Header */}
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-800 bg-gray-900/80 px-4 py-3 backdrop-blur-md">
           {isMobile && (
             <Sheet>
@@ -33,7 +79,10 @@ export function DashboardPage_priceAlerts() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 border-gray-800 bg-gray-900 p-0">
+              <SheetContent
+                side="left"
+                className="w-64 border-gray-800 bg-gray-900 p-0"
+              >
                 <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
               </SheetContent>
             </Sheet>
@@ -41,57 +90,58 @@ export function DashboardPage_priceAlerts() {
           <h1 className="text-xl font-bold text-white">Price Alerts Dashboard</h1>
         </header>
 
-        {/* Main Content */}
         <main className="px-4 py-6 md:px-6 space-y-6">
-          {activeTab === "live-chart" ? (
-            <LiveChart /> // Show LiveChart when "Live Chart" tab is active
-          ) : (
-            <>
-              {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <StatCard_price_alert
-                  title="SOL Price"
-                  value={solPrice}
-                  change={solPriceChange}
-                  changeType="positive"
-                  gradientFrom="from-blue-600"
-                  gradientTo="to-cyan-600"
-                  sentimentTag="Bullish"
-                  lastUpdated="Just now"
-                  chartData={[153, 155, 157, 156, 158, 158.5, 158.34]} // 🧮 Chart Data Example
-                />
-                <LiveDataCard_price_alert /> {/* ✅ Updated Card */}
-              </div>
+          <div className="flex items-center">
+            <span className="bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
+              SOL Price: {solPrice}
+            </span>
+          </div>
 
-              {/* Set Alerts Section */}
-              <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6 shadow-md">
-                <h2 className="text-lg font-semibold text-white mb-2">Set Alerts – Don’t wanna miss out on SOL swings?</h2>
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                  <p className="text-sm text-gray-400">Receive alerts of SOL on Telegram</p>
-                  <Button className="mt-2 md:mt-0 bg-blue-600 hover:bg-blue-700">Register Now</Button>
-                </div>
-                <p className="mt-4 text-sm text-gray-500">Want personalized alerts?</p>
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="rounded-md border border-gray-700 bg-gray-800 p-4 hover:bg-gray-700 cursor-pointer transition">
-                    <h4 className="text-white font-semibold mb-1">Volatility Alerts</h4>
-                    <p className="text-sm text-gray-400">Massive up or dip alerts</p>
-                  </div>
-                  <div className="rounded-md border border-gray-700 bg-gray-800 p-4 hover:bg-gray-700 cursor-pointer transition">
-                    <h4 className="text-white font-semibold mb-1">Set Price Alert</h4>
-                    <p className="text-sm text-gray-400">Customize your alert thresholds</p>
-                  </div>
-                </div>
-              </div>
+          <div className="mt-4">
+            <LiveDataCard_price_alert />
+          </div>
 
-              {/* Leaderboard Section */}
-              <div>
-                <h2 className="text-xl font-semibold text-white mb-4">Top Performing Tokens</h2>
-                <Leaderboard_price_alerts />
+          <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6 shadow-md">
+            <h2 className="text-lg font-semibold text-white mb-4 text-center">
+              Set Alerts – Don&apos;t wanna miss out on SOL swings?
+            </h2>
+            <div className="flex flex-col items-center space-y-4">
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0">
+                {['Volatility', 'Price', 'Range'].map((type) => (
+                  <div key={type} className="text-center">
+                    <p className="text-sm text-gray-400 mb-2">{type} Alert</p>
+                    <Button
+                      className="bg-blue-600 hover:bg-blue-700 flex items-center justify-center space-x-2"
+                      onClick={() => setSelectedAlert(type as AlertType)}
+                    >
+                      <FaBell className="h-4 w-4" />
+                      <span>{type === 'Range' ? 'Click Here' : 'Set Alert'}</span>
+                    </Button>
+                  </div>
+                ))}
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </main>
       </div>
+
+      {selectedAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-full max-w-md rounded-lg bg-zinc-900 p-6 shadow-lg relative">
+            <button
+              className="absolute top-4 right-4 text-white hover:text-gray-300"
+              onClick={() => setSelectedAlert(null)}
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <AlertForm
+              type={selectedAlert}
+              onClose={() => setSelectedAlert(null)}
+              onSubmit={handleFormSubmit}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

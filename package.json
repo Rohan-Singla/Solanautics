@@ -6,9 +6,12 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start:bot": "ts-node lib/telegramBot.ts"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.17.0",
+    "@prisma/client": "^6.6.0",
     "@radix-ui/react-avatar": "^1.1.4",
     "@radix-ui/react-dialog": "^1.1.10",
     "@radix-ui/react-slot": "^1.1.2",
@@ -18,13 +21,16 @@
     "chart.js": "^4.4.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^12.6.3",
+    "framer-motion": "^12.7.4",
     "lucide-react": "^0.487.0",
     "next": "15.2.4",
+    "node-telegram-bot-api": "^0.66.0",
+    "prisma": "^6.6.0",
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
+    "react-icons": "^5.5.0",
     "react-sparklines": "^1.7.0",
     "tailwind-merge": "^3.1.0",
     "tw-animate-css": "^1.2.5",
@@ -34,12 +40,16 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^20.17.30",
+    "@types/node-telegram-bot-api": "^0.64.8",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-icons": "^2.2.7",
+    "@types/react-sparklines": "^1.7.5",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

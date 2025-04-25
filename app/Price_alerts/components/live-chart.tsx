@@ -8,49 +8,84 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  Title,
   Tooltip,
   Legend,
-  ChartOptions,
   ChartData,
   TooltipItem,
+  ChartOptions,
 } from "chart.js";
 
+// Register chart elements
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  Title,
   Tooltip,
   Legend
 );
 
 const LiveChart = () => {
   const [dataPoints, setDataPoints] = useState<number[]>([]);
+  const [price, setPrice] = useState<number | null>(null);
+  const [volume, setVolume] = useState<number | null>(null);
 
+  // Fetch price and volume
+  useEffect(() => {
+    const fetchSOLPrice = async () => {
+      try {
+        const priceRes = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd"
+        );
+        const priceData = await priceRes.json();
+        const solPrice = priceData.solana.usd;
+        setPrice(solPrice);
+
+        const volumeRes = await fetch(
+          "https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=1"
+        );
+        const volumeData = await volumeRes.json();
+        setVolume(
+          volumeData.total_volumes[
+            volumeData.total_volumes.length - 1
+          ][1]
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchSOLPrice();
+    const priceInterval = setInterval(fetchSOLPrice, 30000);
+    return () => clearInterval(priceInterval);
+  }, []);
+
+  // Simulate heartbeat pattern updates every second
   useEffect(() => {
     const interval = setInterval(() => {
-      setDataPoints((prev) => {
-        const last = prev[prev.length - 1] || 30;
-        const newPoint = parseFloat(
-          (last + (Math.random() * 2 - 1)).toFixed(2)
-        ); // slight up/down
-        return [...prev.slice(-19), newPoint];
-      });
-    }, 500); // every 0.5 sec
+      if (price) {
+        setDataPoints((prev) => [
+          ...prev.slice(-19),
+          price + Math.sin(Date.now() / 300) * 0.5, // Heartbeat-like wave
+        ]);
+      }
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [price]);
 
   const data: ChartData<"line"> = {
     labels: Array(dataPoints.length).fill(""),
     datasets: [
       {
-        label: "Simulated Price",
+        label: "SOL Price (USD)",
         data: dataPoints,
-        borderColor: "#22c55e",
-        backgroundColor: "rgba(34,197,94,0.1)",
+        borderColor: "rgba(34, 193, 195, 1)",
+        backgroundColor: "rgba(34, 193, 195, 0.2)",
+        tension: 0.5,
         fill: true,
-        tension: 0.6,
         pointRadius: 0,
         borderWidth: 2,
       },
@@ -61,6 +96,7 @@ const LiveChart = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      legend: { display: false },
       tooltip: {
         callbacks: {
           label: (tooltipItem: TooltipItem<"line">) => {
@@ -69,26 +105,28 @@ const LiveChart = () => {
           },
         },
       },
-      legend: {
-        display: false,
-      },
     },
     scales: {
       x: {
         display: false,
+        type: "category",
       },
       y: {
-        display: true,
+        type: "linear",
+        beginAtZero: false,
         ticks: {
-          callback: (tickValue: string | number) =>
-            typeof tickValue === "number" ? `$${tickValue}` : tickValue,
+          callback: (tickValue: string | number) => {
+            return typeof tickValue === "number"
+              ? `$${tickValue.toFixed(2)}`
+              : tickValue;
+          },
         },
       },
     },
   };
 
   return (
-    <div className="w-full h-72 md:h-96 rounded-xl bg-black p-4">
+    <div className="w-full h-[300px] md:h-[400px] p-4 rounded-lg shadow-md bg-white">
       <Line data={data} options={options} />
     </div>
   );
