@@ -5,6 +5,33 @@ import cron from 'node-cron';
 // Local in-memory storage for wallets
 let trackedWallets: string[] = [];
 
+async function sendTelegramNotification(userId: string, walletAddress: string, latestTx: string) {
+    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+
+    if (!TELEGRAM_BOT_TOKEN) {
+        console.error('Telegram bot token is missing');
+        return;
+    }
+
+    const message = `Wallet ${walletAddress} has a new transaction! The latest TX hash: ${latestTx}`;
+
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    try {
+        await axios.post(url, {
+            chat_id: userId,
+            text: message,
+        });
+        console.log(`Notification sent to user ${userId} for wallet ${walletAddress}`);
+    } catch (error: any) {
+        console.error('Error sending Telegram notification:', error.message);
+    }
+}
+
+function loadTrackedWalletsFromLocalStorage() {
+    const storedWallets = localStorage.getItem("tracked_wallets");
+    return storedWallets ? JSON.parse(storedWallets) : [];
+}
 // Function to update wallets
 async function updateTrackedWallets() {
     const SOLSCAN_API_KEY = process.env.SOLSCAN_API_KEY ?? '';
@@ -17,41 +44,54 @@ async function updateTrackedWallets() {
     console.log('Running daily Solscan cron job...');
 
     try {
-        // Assuming trackedWallets is already populated with wallet addresses to track
+        // Load tracked wallets from localStorage
+        let trackedWallets = loadTrackedWalletsFromLocalStorage();
         let updatedWallets = [];
 
-        for (const walletAddress of trackedWallets) {
+        for (let wallet of trackedWallets) {
             const url = "https://pro-api.solscan.io/v2.0/account/transactions";
 
+            // Fetch the latest transactions for the wallet
             const response = await axios.get(url, {
                 params: {
-                    address: walletAddress,
-                    limit: 10,
+                    address: wallet.address,  // Use the wallet address stored in the wallet object
+                    limit: 10,  // Limit to the latest 10 transactions
                 },
                 headers: {
                     token: SOLSCAN_API_KEY,
                 },
             });
 
-            console.log(`Fetched latest transactions for ${walletAddress}:`, response.data);
+            console.log(`Fetched latest transactions for ${wallet.address}:`, response.data);
 
-            updatedWallets.push({
-                walletAddress,
-                transactions: response.data,
-            });
+            // Get the latest transaction hash
+            const latestTx = response.data.data[0]?.txHash;
+            console.log(`Fetched latest transaction for ${wallet.address}:`, latestTx);
+
+            // Check if the latest transaction has changed
+            if (latestTx !== wallet.latestTx) {
+                // Update the wallet object with the new transaction hash
+                wallet.latestTx = latestTx;
+
+                // Send a Telegram notification if the transaction has changed
+                await sendTelegramNotification(wallet.rawAddress, wallet.address, latestTx);
+            }
+
+            // Push the updated wallet object to the updatedWallets array
+            updatedWallets.push(wallet);
         }
 
+        // Save the updated wallet list back to localStorage
         localStorage.setItem("tracked_wallets", JSON.stringify(updatedWallets));
 
         console.log('Updated tracked wallets in localStorage');
-
     } catch (err: any) {
-        console.error('Error running cron job:', err.message);
+        console.error('Error updating tracked wallets:', err.message);
     }
 }
 
 // Setup cron job to run daily at midnight
-cron.schedule('0 0 * * *', async () => {
+cron.schedule('* * * * *', async () => {
     await updateTrackedWallets();
 });
 
