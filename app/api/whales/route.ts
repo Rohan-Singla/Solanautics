@@ -17,6 +17,9 @@ async function updateTrackedWallets() {
     console.log('Running daily Solscan cron job...');
 
     try {
+        // Assuming trackedWallets is already populated with wallet addresses to track
+        let updatedWallets = [];
+
         for (const walletAddress of trackedWallets) {
             const url = "https://pro-api.solscan.io/v2.0/account/transactions";
 
@@ -31,15 +34,24 @@ async function updateTrackedWallets() {
             });
 
             console.log(`Fetched latest transactions for ${walletAddress}:`, response.data);
-            // Here you can store updated data somewhere if needed (DB, cache, etc)
+
+            updatedWallets.push({
+                walletAddress,
+                transactions: response.data,
+            });
         }
+
+        localStorage.setItem("tracked_wallets", JSON.stringify(updatedWallets));
+
+        console.log('Updated tracked wallets in localStorage');
+
     } catch (err: any) {
         console.error('Error running cron job:', err.message);
     }
 }
 
 // Setup cron job to run daily at midnight
-cron.schedule('* * * * *', async () => {
+cron.schedule('0 0 * * *', async () => {
     await updateTrackedWallets();
 });
 
