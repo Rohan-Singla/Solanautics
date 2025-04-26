@@ -9,43 +9,12 @@ import { WhaleLeaderboard } from "./Whale-Leaderboard"
 import { SideNav } from "./Side-Nav"
 import { StatCard } from "./Stats-Card"
 import { useMobile } from "@/hooks/use-mobile"
-import axios from 'axios'
 import { WalletTracker } from "./Wallet-Tracker"
 
 export function DashboardPage() {
   const isMobile = useMobile()
   const [activeTab, setActiveTab] = useState("leaderboard");
-  const [wallets, setWallets] = useState([]);
-  const [whales, setWhales] = useState([]);
 
-  // Function to handle adding a wallet address
-  const addWallet = (walletAddress: string) => {
-    setWallets((prev) => [...prev, walletAddress]);
-  };
-
-  // Function to fetch transactions for all added wallets
-  const fetchWhales = async () => {
-    try {
-      const responses = await Promise.all(
-        wallets.map(async (walletAddress) => {
-          const res = await axios.post('/api/whales', { walletAddress });
-          return res.data;
-        })
-      );
-
-      // Update the whales state with the fetched data
-      setWhales(responses);
-    } catch (err) {
-      console.error('Error fetching whales:', err);
-    }
-  };
-
-  // Fetch whales when wallets change
-  useEffect(() => {
-    if (wallets.length > 0) {
-      fetchWhales();
-    }
-  }, [wallets]);
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -100,7 +69,7 @@ export function DashboardPage() {
               <CardTitle className="text-xl font-bold text-white">Track Wallets</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <WalletTracker onAddWallet={''}/>
+              <WalletTracker />
               <WhaleLeaderboard />
             </CardContent>
           </Card>

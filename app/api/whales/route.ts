@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(response.data);
 
-    } catch (err) {
+    } catch (err : any) {
         console.error('Solscan API error:', err);  // Log the error
         return NextResponse.json({ error: 'Failed to fetch Solscan data', details: err.message }, { status: 500 });
     }
