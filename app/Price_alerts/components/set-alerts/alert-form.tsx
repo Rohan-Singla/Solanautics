@@ -31,7 +31,6 @@ const AlertForm: React.FC<AlertFormProps> = ({ type, onClose, onSubmit }) => {
   const [threshold, setThreshold] = useState('');
   const [rangeMin, setRangeMin] = useState('');
   const [rangeMax, setRangeMax] = useState('');
-  const [showTelegramPrompt, setShowTelegramPrompt] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,14 +71,10 @@ const AlertForm: React.FC<AlertFormProps> = ({ type, onClose, onSubmit }) => {
         });
       }
 
-      // ✅ Show Telegram link after successful submission
-      setShowTelegramPrompt(true);
-      console.log("Show telegram prompt:", showTelegramPrompt);
+      onClose(); // Close form after submission
     } catch {
       alert('Something went wrong while setting alert.');
     }
-
-    onClose(); // keep this if you still want modal to close instantly
   };
 
   return (
@@ -159,22 +154,6 @@ const AlertForm: React.FC<AlertFormProps> = ({ type, onClose, onSubmit }) => {
           Cancel
         </button>
       </div>
-
-      {showTelegramPrompt && (
-        <div className="mt-4 bg-green-800/30 border border-green-500 text-green-300 p-4 rounded-lg text-sm">
-          ✅ Alert set successfully! Now connect with our Telegram bot for real-time alerts. <br />
-          👉{' '}
-          <a
-            href="https://t.me/Solanautics_Alerts_bot"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline font-semibold text-green-400"
-          >
-            Click here to start the bot
-          </a>{' '}
-          and press <strong>/start</strong> to activate alerts!
-        </div>
-      )}
     </form>
   );
 };

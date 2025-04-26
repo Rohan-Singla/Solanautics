@@ -3,41 +3,53 @@
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 import { prisma } from './prisma';
 
-const token = process.env.TELEGRAM_BOT_TOKEN!;
+const token = process.env.TELEGRAM_BOT_TOKEN;
+
+if (!token) {
+  console.error('❌ TELEGRAM_BOT_TOKEN is missing!');
+  process.exit(1);
+}
+
 const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/start/, async (msg: Message) => {
   const chatId = msg.chat.id.toString();
-  const userId = chatId; // We're treating Telegram chatId as userId in this setup
+  const userId = chatId; // We treat Telegram chatId as userId for simplicity
 
-  // 1. Save chat ID to TelegramChat model if not exists
-  const existingChat = await prisma.telegramChat.findUnique({ where: { chatId } });
+  console.log('🔔 /start received from chatId:', chatId);
 
-  if (!existingChat) {
-    await prisma.telegramChat.create({
-      data: {
-        userId,
-        chatId,
-      },
+  try {
+    // Check if chat already exists
+    const existingChat = await prisma.telegramChat.findUnique({ where: { chatId } });
+
+    if (!existingChat) {
+      console.log('➕ No existing chat found. Creating TelegramChat...');
+      await prisma.telegramChat.create({
+        data: {
+          userId,
+          chatId,
+        },
+      });
+      console.log('✅ Created TelegramChat entry.');
+    } else {
+      console.log('ℹ️ Chat already exists. Skipping creation.');
+    }
+
+    // Link chatId to existing alerts without chatId
+    await prisma.priceAlert.updateMany({
+      where: { userId, chatId: null },
+      data: { chatId },
     });
-  }
+    console.log('🔗 Linked chatId to price alerts if any.');
 
-  // 2. Link this chatId to any existing alerts without chatId
-  await prisma.priceAlert.updateMany({
-    where: {
-      userId,
-      chatId: null,
-    },
-    data: {
+    // Send welcome message
+    await bot.sendMessage(
       chatId,
-    },
-  });
-
-  // 3. Send confirmation
-  bot.sendMessage(
-    chatId,
-    `🚀 You're now connected to Solanautics Alerts! We'll notify you when any of your alert conditions are triggered.`
-  );
+      `🚀 You're now connected to Solanautics Alerts! We'll notify you when your alert triggers.`
+    );
+  } catch (error) {
+    console.error('❌ Error during /start processing:', error);
+  }
 });
 
 export { bot };

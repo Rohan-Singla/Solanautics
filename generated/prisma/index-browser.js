@@ -151,7 +151,11 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.AlertType = exports.$Enums.AlertType = {
+  Price: 'Price',
+  Volatility: 'Volatility',
+  Range: 'Range'
+};
 
 exports.Prisma.ModelName = {
   PriceAlert: 'PriceAlert',

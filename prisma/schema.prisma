@@ -15,16 +15,16 @@ datasource db {
 }
 
 model PriceAlert {
-  id          String         @id @default(uuid())
-  type        AlertType      // Enum for alert type: 'Price', 'Volatility', 'Range'
-  threshold   Float?         // Used for 'Price' and 'Volatility'
-  duration    Int?           // Used for 'Volatility' (hours)
-  minPrice    Float?         // Used for 'Range'
-  maxPrice    Float?         // Used for 'Range'
-  createdAt   DateTime       @default(now())
-  userId      String
-  chatId      String?
-  telegramChat TelegramChat? @relation(fields: [chatId], references: [chatId])
+  id           String        @id @default(uuid())
+  type         AlertType // Enum for alert type: 'Price', 'Volatility', 'Range'
+  threshold    Float? // Used for 'Price' and 'Volatility'
+  duration     Int? // Used for 'Volatility' (hours)
+  minPrice     Float? // Used for 'Range'
+  maxPrice     Float? // Used for 'Range'
+  createdAt    DateTime      @default(now())
+  userId       String
+  chatId       String?
+  telegramChat TelegramChat? @relation("ChatRelation", fields: [chatId], references: [chatId])
 }
 
 enum AlertType {
@@ -34,10 +34,10 @@ enum AlertType {
 }
 
 model TelegramChat {
-  id        Int          @id @default(autoincrement())
-  userId    String       // Reference to the user (could be your Clerk ID)
-  chatId    String       @unique // Telegram chat ID for sending alerts
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-  priceAlerts PriceAlert[]
+  id          Int          @id @default(autoincrement())
+  userId      String // Reference to the user (could be your Clerk ID)
+  chatId      String       @unique // Telegram chat ID for sending alerts
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  priceAlerts PriceAlert[] @relation("ChatRelation")
 }

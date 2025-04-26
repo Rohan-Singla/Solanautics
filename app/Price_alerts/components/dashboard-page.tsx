@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -16,12 +16,54 @@ export function DashboardPage_priceAlerts() {
   const isMobile = useMobile();
   const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedAlert, setSelectedAlert] = useState<AlertType>(null);
-  const [showTelegramPrompt, setShowTelegramPrompt] = useState(false);
+  const [showTelegramModal, setShowTelegramModal] = useState(false);
+  const [userId, setUserId] = useState<string>('');
+  const [connectedToastShown, setConnectedToastShown] = useState(false);
+
+  // Fetch from localstorage initially
+  useEffect(() => {
+    const chatId = localStorage.getItem('telegramChatId');
+    if (chatId) {
+      setUserId(chatId);
+    }
+  }, []);
+
+  const checkTelegramChatId = async () => {
+    if (!userId) {
+      try {
+        const response = await fetch('/api/telegram/get-chat-id');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.chatId) {
+            setUserId(data.chatId);
+            localStorage.setItem('telegramChatId', data.chatId);
+            setShowTelegramModal(false);
+            if (!connectedToastShown) {
+              alert('✅ Connected to Telegram!');
+              setConnectedToastShown(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error fetching Telegram Chat ID:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(checkTelegramChatId, 5000);
+    return () => clearInterval(interval);
+  }, [userId, connectedToastShown]);
 
   const handleFormSubmit = async (data: any) => {
     const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
     if (!token) {
       console.error('Solscan API token is missing');
+      return;
+    }
+
+    if (!userId) {
+      setShowTelegramModal(true);
       return;
     }
 
@@ -32,49 +74,30 @@ export function DashboardPage_priceAlerts() {
         ? '/api/price-alerts/set/price-alert'
         : '/api/price-alerts/set/range-alert';
 
-    const payload = {
-      ...data,
-      userId: 'user123', // TEMP hardcoded
-    };
+    const payload = { ...data, userId };
 
     try {
-      console.log('🌐 Fetching from:', endpoint);
-      console.log('📦 Payload:', data);
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          token,
-        },
+        headers: { 'Content-Type': 'application/json', token },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to submit alert: ${response.statusText}`);
-      }
-
+      if (!response.ok) throw new Error('Failed to submit alert');
       const result = await response.json();
       console.log('✅ API Response:', result);
-      console.log("Telegram link received:", result.telegramLink);
       alert('✅ Alert set successfully!');
-
-      // 👇 Show Telegram banner
-      setShowTelegramPrompt(true);
-      setTimeout(() => setShowTelegramPrompt(false), 10000); // Auto-hide after 10 sec
     } catch (error) {
       console.error('❌ Error submitting alert:', error);
       alert('❌ Failed to set alert.');
     }
   };
 
-  const solPrice = '$158.34'; // Replace with live data if needed
-
   return (
     <div className="flex min-h-screen bg-black text-white">
       {!isMobile && (
         <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
       )}
-
       <div className="flex-1">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-800 bg-gray-900/80 px-4 py-3 backdrop-blur-md">
           {isMobile && (
@@ -85,10 +108,7 @@ export function DashboardPage_priceAlerts() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent
-                side="left"
-                className="w-64 border-gray-800 bg-gray-900 p-0"
-              >
+              <SheetContent side="left" className="w-64 border-gray-800 bg-gray-900 p-0">
                 <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
               </SheetContent>
             </Sheet>
@@ -97,38 +117,7 @@ export function DashboardPage_priceAlerts() {
         </header>
 
         <main className="px-4 py-6 md:px-6 space-y-6">
-          {showTelegramPrompt && (
-            <div className="bg-cyan-800/20 border border-cyan-700 p-4 rounded-lg text-white flex justify-between items-center">
-              <p>
-                🚀 You're all set! Now,{' '}
-                <a
-                  href="https://t.me/Solanautics_Alerts_bot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-semibold"
-                >
-                  start the Telegram bot
-                </a>{' '}
-                to get your alert notifications.
-              </p>
-              <button
-                onClick={() => setShowTelegramPrompt(false)}
-                className="ml-4 text-gray-300 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          <div className="flex items-center">
-            <span className="bg-blue-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
-              SOL Price: {solPrice}
-            </span>
-          </div>
-
-          <div className="mt-4">
-            <LiveDataCard_price_alert />
-          </div>
+          <LiveDataCard_price_alert />
 
           <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6 shadow-md">
             <h2 className="text-lg font-semibold text-white mb-4 text-center">
@@ -141,7 +130,13 @@ export function DashboardPage_priceAlerts() {
                     <p className="text-sm text-gray-400 mb-2">{type} Alert</p>
                     <Button
                       className="bg-blue-600 hover:bg-blue-700 flex items-center justify-center space-x-2"
-                      onClick={() => setSelectedAlert(type as AlertType)}
+                      onClick={() => {
+                        if (!userId) {
+                          setShowTelegramModal(true);
+                          return;
+                        }
+                        setSelectedAlert(type as AlertType);
+                      }}
                     >
                       <FaBell className="h-4 w-4" />
                       <span>{type === 'Range' ? 'Click Here' : 'Set Alert'}</span>
@@ -168,6 +163,31 @@ export function DashboardPage_priceAlerts() {
               onClose={() => setSelectedAlert(null)}
               onSubmit={handleFormSubmit}
             />
+          </div>
+        </div>
+      )}
+
+      {showTelegramModal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center">
+          <div className="bg-zinc-900 p-6 rounded-lg shadow-xl max-w-md w-full text-white relative">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-white"
+              onClick={() => setShowTelegramModal(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-lg font-bold mb-3">🚀 Connect Telegram Bot</h3>
+            <p className="text-sm mb-4">
+              Start the bot now to receive your SOL price alerts:
+            </p>
+            <a
+              href="https://t.me/Solanautics_Alerts_bot"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 underline font-semibold"
+            >
+              👉 Click here to connect and type <strong>/start</strong>
+            </a>
           </div>
         </div>
       )}

@@ -25,6 +25,24 @@ export type PriceAlert = $Result.DefaultSelection<Prisma.$PriceAlertPayload>
 export type TelegramChat = $Result.DefaultSelection<Prisma.$TelegramChatPayload>
 
 /**
+ * Enums
+ */
+export namespace $Enums {
+  export const AlertType: {
+  Price: 'Price',
+  Volatility: 'Volatility',
+  Range: 'Range'
+};
+
+export type AlertType = (typeof AlertType)[keyof typeof AlertType]
+
+}
+
+export type AlertType = $Enums.AlertType
+
+export const AlertType: typeof $Enums.AlertType
+
+/**
  * ##  Prisma Client ʲˢ
  *
  * Type-safe database client for TypeScript & Node.js
@@ -1018,7 +1036,7 @@ export namespace Prisma {
 
   export type PriceAlertMinAggregateOutputType = {
     id: string | null
-    type: string | null
+    type: $Enums.AlertType | null
     threshold: number | null
     duration: number | null
     minPrice: number | null
@@ -1030,7 +1048,7 @@ export namespace Prisma {
 
   export type PriceAlertMaxAggregateOutputType = {
     id: string | null
-    type: string | null
+    type: $Enums.AlertType | null
     threshold: number | null
     duration: number | null
     minPrice: number | null
@@ -1193,7 +1211,7 @@ export namespace Prisma {
 
   export type PriceAlertGroupByOutputType = {
     id: string
-    type: string
+    type: $Enums.AlertType
     threshold: number | null
     duration: number | null
     minPrice: number | null
@@ -1291,7 +1309,7 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      type: string
+      type: $Enums.AlertType
       threshold: number | null
       duration: number | null
       minPrice: number | null
@@ -1724,7 +1742,7 @@ export namespace Prisma {
    */
   interface PriceAlertFieldRefs {
     readonly id: FieldRef<"PriceAlert", 'String'>
-    readonly type: FieldRef<"PriceAlert", 'String'>
+    readonly type: FieldRef<"PriceAlert", 'AlertType'>
     readonly threshold: FieldRef<"PriceAlert", 'Float'>
     readonly duration: FieldRef<"PriceAlert", 'Int'>
     readonly minPrice: FieldRef<"PriceAlert", 'Float'>
@@ -3353,6 +3371,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'AlertType'
+   */
+  export type EnumAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertType'>
+    
+
+
+  /**
+   * Reference to a field of type 'AlertType[]'
+   */
+  export type ListEnumAlertTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AlertType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -3402,7 +3434,7 @@ export namespace Prisma {
     OR?: PriceAlertWhereInput[]
     NOT?: PriceAlertWhereInput | PriceAlertWhereInput[]
     id?: StringFilter<"PriceAlert"> | string
-    type?: StringFilter<"PriceAlert"> | string
+    type?: EnumAlertTypeFilter<"PriceAlert"> | $Enums.AlertType
     threshold?: FloatNullableFilter<"PriceAlert"> | number | null
     duration?: IntNullableFilter<"PriceAlert"> | number | null
     minPrice?: FloatNullableFilter<"PriceAlert"> | number | null
@@ -3431,7 +3463,7 @@ export namespace Prisma {
     AND?: PriceAlertWhereInput | PriceAlertWhereInput[]
     OR?: PriceAlertWhereInput[]
     NOT?: PriceAlertWhereInput | PriceAlertWhereInput[]
-    type?: StringFilter<"PriceAlert"> | string
+    type?: EnumAlertTypeFilter<"PriceAlert"> | $Enums.AlertType
     threshold?: FloatNullableFilter<"PriceAlert"> | number | null
     duration?: IntNullableFilter<"PriceAlert"> | number | null
     minPrice?: FloatNullableFilter<"PriceAlert"> | number | null
@@ -3464,7 +3496,7 @@ export namespace Prisma {
     OR?: PriceAlertScalarWhereWithAggregatesInput[]
     NOT?: PriceAlertScalarWhereWithAggregatesInput | PriceAlertScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"PriceAlert"> | string
-    type?: StringWithAggregatesFilter<"PriceAlert"> | string
+    type?: EnumAlertTypeWithAggregatesFilter<"PriceAlert"> | $Enums.AlertType
     threshold?: FloatNullableWithAggregatesFilter<"PriceAlert"> | number | null
     duration?: IntNullableWithAggregatesFilter<"PriceAlert"> | number | null
     minPrice?: FloatNullableWithAggregatesFilter<"PriceAlert"> | number | null
@@ -3533,7 +3565,7 @@ export namespace Prisma {
 
   export type PriceAlertCreateInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -3545,7 +3577,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedCreateInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -3557,7 +3589,7 @@ export namespace Prisma {
 
   export type PriceAlertUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -3569,7 +3601,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -3581,7 +3613,7 @@ export namespace Prisma {
 
   export type PriceAlertCreateManyInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -3593,7 +3625,7 @@ export namespace Prisma {
 
   export type PriceAlertUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -3604,7 +3636,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -3684,6 +3716,13 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
+  }
+
+  export type EnumAlertTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AlertType | EnumAlertTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAlertTypeFilter<$PrismaModel> | $Enums.AlertType
   }
 
   export type FloatNullableFilter<$PrismaModel = never> = {
@@ -3810,6 +3849,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type EnumAlertTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AlertType | EnumAlertTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAlertTypeWithAggregatesFilter<$PrismaModel> | $Enums.AlertType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAlertTypeFilter<$PrismaModel>
+    _max?: NestedEnumAlertTypeFilter<$PrismaModel>
   }
 
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -3955,6 +4004,10 @@ export namespace Prisma {
     set?: string
   }
 
+  export type EnumAlertTypeFieldUpdateOperationsInput = {
+    set?: $Enums.AlertType
+  }
+
   export type NullableFloatFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -4053,6 +4106,13 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedEnumAlertTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.AlertType | EnumAlertTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAlertTypeFilter<$PrismaModel> | $Enums.AlertType
+  }
+
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -4126,6 +4186,16 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumAlertTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AlertType | EnumAlertTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AlertType[] | ListEnumAlertTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumAlertTypeWithAggregatesFilter<$PrismaModel> | $Enums.AlertType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAlertTypeFilter<$PrismaModel>
+    _max?: NestedEnumAlertTypeFilter<$PrismaModel>
   }
 
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -4266,7 +4336,7 @@ export namespace Prisma {
 
   export type PriceAlertCreateWithoutTelegramChatInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -4277,7 +4347,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedCreateWithoutTelegramChatInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -4317,7 +4387,7 @@ export namespace Prisma {
     OR?: PriceAlertScalarWhereInput[]
     NOT?: PriceAlertScalarWhereInput | PriceAlertScalarWhereInput[]
     id?: StringFilter<"PriceAlert"> | string
-    type?: StringFilter<"PriceAlert"> | string
+    type?: EnumAlertTypeFilter<"PriceAlert"> | $Enums.AlertType
     threshold?: FloatNullableFilter<"PriceAlert"> | number | null
     duration?: IntNullableFilter<"PriceAlert"> | number | null
     minPrice?: FloatNullableFilter<"PriceAlert"> | number | null
@@ -4329,7 +4399,7 @@ export namespace Prisma {
 
   export type PriceAlertCreateManyTelegramChatInput = {
     id?: string
-    type: string
+    type: $Enums.AlertType
     threshold?: number | null
     duration?: number | null
     minPrice?: number | null
@@ -4340,7 +4410,7 @@ export namespace Prisma {
 
   export type PriceAlertUpdateWithoutTelegramChatInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -4351,7 +4421,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedUpdateWithoutTelegramChatInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null
@@ -4362,7 +4432,7 @@ export namespace Prisma {
 
   export type PriceAlertUncheckedUpdateManyWithoutTelegramChatInput = {
     id?: StringFieldUpdateOperationsInput | string
-    type?: StringFieldUpdateOperationsInput | string
+    type?: EnumAlertTypeFieldUpdateOperationsInput | $Enums.AlertType
     threshold?: NullableFloatFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     minPrice?: NullableFloatFieldUpdateOperationsInput | number | null

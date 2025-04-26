@@ -2,6 +2,8 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import "@/lib/bot-loader"; 
+
 
 export async function POST(req: Request) {
   try {
@@ -12,12 +14,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    const telegramChat = await prisma.telegramChat.findFirst({
+      where: { userId },
+    });
+
+    if (!telegramChat) {
+      return NextResponse.json({ error: 'Telegram Chat ID not found for this user.' }, { status: 404 });
+    }
+
     const alert = await prisma.priceAlert.create({
       data: {
         userId,
         type: 'Range',
         minPrice,
         maxPrice,
+        chatId: telegramChat.chatId,
       },
     });
 
