@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { WhaleLeaderboard } from "./Whale-Leaderboard"
 import { SideNav } from "./Side-Nav"
-import { StatCard } from "./Stats-Card"
 import { useMobile } from "@/hooks/use-mobile"
 import { WalletTracker } from "./Wallet-Tracker"
 
@@ -38,31 +37,6 @@ export function DashboardPage() {
         </header>
 
         <main className="px-4 py-6 md:px-6">
-          <div className="mb-6 grid gap-4 md:grid-cols-3">
-            <StatCard
-              title="Total Whales Tracked"
-              value="1,248"
-              change="+12"
-              changeType="positive"
-              gradientFrom="from-purple-600"
-              gradientTo="to-indigo-600"
-            />
-            <StatCard
-              title="Volume Today"
-              value="$42.8M"
-              change="+18%"
-              changeType="positive"
-              gradientFrom="from-blue-600"
-              gradientTo="to-cyan-600"
-            />
-            <StatCard
-              title="Most Active Whale"
-              value="sol...4x8j"
-              subValue="$8.2M volume"
-              gradientFrom="from-pink-600"
-              gradientTo="to-purple-600"
-            />
-          </div>
 
           <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
             <CardHeader className="border-b border-gray-800 pb-3">
