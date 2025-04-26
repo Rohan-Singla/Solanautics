@@ -1,9 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import { ArrowUpDown, ExternalLink, Check } from "lucide-react";
+import { ArrowUpDown, ExternalLink, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useMobile } from "@/hooks/use-mobile";
 
 interface WhaleData {
   address: string;
@@ -49,6 +46,21 @@ export function WhaleLeaderboard() {
     setTimeout(() => setCopiedText(null), 1000);
   };
 
+  const handleDeleteWallet = (walletAddress: string) => {
+    const updatedWhales = whales.filter((whale) => whale.rawAddress !== walletAddress);
+    setWhales(updatedWhales);
+    localStorage.setItem("tracked_wallets", JSON.stringify(updatedWhales));
+  };
+
+  const handleAddWallet = (newWallet: WhaleData) => {
+    // Add the new wallet to the whales array
+    const updatedWhales = [...whales, newWallet];
+    setWhales(updatedWhales);
+
+    // Update local storage immediately
+    localStorage.setItem("tracked_wallets", JSON.stringify(updatedWhales));
+  };
+
   useEffect(() => {
     loadWhalesFromLocalStorage();
 
@@ -65,15 +77,12 @@ export function WhaleLeaderboard() {
   const filteredWhales = whales.filter((whale) => {
     const matchesWallet = whale.address.toLowerCase().includes(searchWallet.toLowerCase());
     const matchesRawAddress = whale.rawAddress.toLowerCase().includes(searchRawAddress.toLowerCase());
-
     return matchesWallet && matchesRawAddress;
   });
 
   const sortedWhales = [...filteredWhales].sort((a, b) => {
     if (sortColumn === "block_time") {
-      return sortDirection === "asc"
-        ? a.blockTime - b.blockTime
-        : b.blockTime - a.blockTime;
+      return sortDirection === "asc" ? a.blockTime - b.blockTime : b.blockTime - a.blockTime;
     }
     return 0;
   });
@@ -120,7 +129,7 @@ export function WhaleLeaderboard() {
             <th className="whitespace-nowrap px-4 py-3">Tx Signer</th>
             <th className="whitespace-nowrap px-4 py-3">
               <button
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 cursor-pointer"
                 onClick={() => handleSort("block_time")}
               >
                 Block Time
@@ -140,13 +149,9 @@ export function WhaleLeaderboard() {
                 <td className="whitespace-nowrap px-4 py-3 font-medium">{index + 1}</td>
 
                 {/* Wallet Name */}
-                <td
-                  className="whitespace-nowrap px-4 py-3 max-w-[200px] truncate cursor-pointer"
-                >
+                <td className="whitespace-nowrap px-4 py-3 max-w-[200px] truncate cursor-pointer">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white truncate">
-                      {whale.address}
-                    </span>
+                    <span className="font-medium text-white truncate">{whale.address}</span>
                   </div>
                 </td>
 
@@ -157,9 +162,7 @@ export function WhaleLeaderboard() {
                   title="Click to copy"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white truncate">
-                      {whale.rawAddress.slice(0, 10)}...
-                    </span>
+                    <span className="font-medium text-white truncate">{whale.rawAddress.slice(0, 10)}...</span>
                     {copiedText === whale.rawAddress && <span className="text-green-400">Copied!</span>}
                   </div>
                 </td>
@@ -171,9 +174,7 @@ export function WhaleLeaderboard() {
                   title="Click to copy"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white truncate">
-                      {whale.latestTx.slice(0, 10)}...
-                    </span>
+                    <span className="font-medium text-white truncate">{whale.latestTx.slice(0, 10)}...</span>
                     {copiedText === whale.latestTx && <span className="text-green-400">Copied!</span>}
                   </div>
                 </td>
@@ -208,6 +209,17 @@ export function WhaleLeaderboard() {
                     >
                       View Tx
                       <ExternalLink className="ml-1 h-3 w-3" />
+                    </Button>
+
+                    {/* Delete Wallet Button */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300 cursor-pointer"
+                      onClick={() => handleDeleteWallet(whale.rawAddress)}
+                    >
+                      Delete
+                      <Trash className="ml-1 h-3 w-3" />
                     </Button>
                   </div>
                 </td>

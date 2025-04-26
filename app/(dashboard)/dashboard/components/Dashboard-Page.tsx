@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -66,7 +66,7 @@ export function DashboardPage() {
 
           <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
             <CardHeader className="border-b border-gray-800 pb-3">
-              <CardTitle className="text-xl font-bold text-white">Track Wallets</CardTitle>
+              <CardTitle className="text-xl font-bold text-white">Track Wallets and Recent Txs</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               <WalletTracker />

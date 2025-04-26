@@ -29,6 +29,9 @@ importers:
       axios:
         specifier: ^1.8.4
         version: 1.8.4
+      bs58:
+        specifier: ^6.0.0
+        version: 6.0.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -44,6 +47,9 @@ importers:
       next:
         specifier: 15.2.4
         version: 15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      node-cron:
+        specifier: ^3.0.3
+        version: 3.0.3
       react:
         specifier: ^19.0.0
         version: 19.1.0
@@ -2328,6 +2334,10 @@ packages:
 
   node-addon-api@2.0.2:
     resolution: {integrity: sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==}
+
+  node-cron@3.0.3:
+    resolution: {integrity: sha512-dOal67//nohNgYWb+nWmg5dkFdIwDm8EpeGYMekPMrngV3637lqnX0lbUcCtgibHTz6SEz7DAIjKvKDFYCnO1A==}
+    engines: {node: '>=6.0.0'}
 
   node-fetch-native@1.6.6:
     resolution: {integrity: sha512-8Mc2HhqPdlIfedsuZoc3yioPuzp6b+L5jRCRY1QzuWZh2EGJVQrGppC6V6cF0bLdbW0+O2YpqCA25aF/1lvipQ==}
@@ -5978,6 +5988,10 @@ snapshots:
       - babel-plugin-macros
 
   node-addon-api@2.0.2: {}
+
+  node-cron@3.0.3:
+    dependencies:
+      uuid: 8.3.2
 
   node-fetch-native@1.6.6: {}
 
