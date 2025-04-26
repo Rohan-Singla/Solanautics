@@ -10,27 +10,42 @@ import { SideNav } from "./Side-Nav"
 import { StatCard } from "./Stats-Card"
 import { useMobile } from "@/hooks/use-mobile"
 import axios from 'axios'
+import { WalletTracker } from "./Wallet-Tracker"
 
 export function DashboardPage() {
   const isMobile = useMobile()
   const [activeTab, setActiveTab] = useState("leaderboard");
-  const [whales, setWhales] = useState([])
+  const [wallets, setWallets] = useState([]);
+  const [whales, setWhales] = useState([]);
 
-  useEffect(() => {
-    const fetchWhales = async () => {
-      try {
-        const res = await axios.get('/api/whales')
-        setWhales(res.data);
-      } catch (err) {
-        console.error('Error fetching whales:', err)
-      }
+  // Function to handle adding a wallet address
+  const addWallet = (walletAddress: string) => {
+    setWallets((prev) => [...prev, walletAddress]);
+  };
+
+  // Function to fetch transactions for all added wallets
+  const fetchWhales = async () => {
+    try {
+      const responses = await Promise.all(
+        wallets.map(async (walletAddress) => {
+          const res = await axios.post('/api/whales', { walletAddress });
+          return res.data;
+        })
+      );
+
+      // Update the whales state with the fetched data
+      setWhales(responses);
+    } catch (err) {
+      console.error('Error fetching whales:', err);
     }
-    fetchWhales();
-  }, [])
+  };
 
-  if (whales) {
-    console.log(whales);
-  }
+  // Fetch whales when wallets change
+  useEffect(() => {
+    if (wallets.length > 0) {
+      fetchWhales();
+    }
+  }, [wallets]);
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -82,9 +97,10 @@ export function DashboardPage() {
 
           <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
             <CardHeader className="border-b border-gray-800 pb-3">
-              <CardTitle className="text-xl font-bold text-white">Whale Leaderboard</CardTitle>
+              <CardTitle className="text-xl font-bold text-white">Track Wallets</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
+              <WalletTracker onAddWallet={''}/>
               <WhaleLeaderboard />
             </CardContent>
           </Card>

@@ -1,23 +1,41 @@
-import { NextResponse } from 'next/server'
-import { DuneClient, QueryParameter } from '@duneanalytics/client-sdk'
+import axios from 'axios';
+import { NextRequest, NextResponse } from 'next/server';
 
-const dune = new DuneClient(process.env.DUNE_API_KEY || 'mnj57v5qHcjDN556lFpO653d6T1UZb07')
-
-export async function GET() {
+export async function POST(req: NextRequest) {
     try {
-        const parameters = {
-            query_parameters: [
-                QueryParameter.text('TextField', 'Plain Text'),
-            ],
+        const { walletAddress } = await req.json();
+
+        console.log('Wallet Address:', walletAddress);
+
+        if (!walletAddress) {
+            throw new Error('Wallet address is required');
         }
-        const queryID = 3917753;
-        const executionResult = await dune.runQuery(queryID);
-        const rows = executionResult.result?.rows || []
-        const data = await dune.getLatestResult({ queryId: 3917753 })
-        return NextResponse.json(rows)
-        // return NextResponse.json(data?.result?.rows)
+
+        const SOLSCAN_API_KEY = process.env.SOLSCAN_API_KEY ?? '';
+
+        if (!SOLSCAN_API_KEY) {
+            throw new Error('Solscan API key is not set');
+        }
+
+
+        const url = "https://pro-api.solscan.io/v2.0/account/transactions";
+
+        const response = await axios.get(url, {
+            params: {
+                address: walletAddress,
+                limit: 10,
+            },
+            headers: {
+                token: SOLSCAN_API_KEY,
+            },
+        });
+
+        console.log('Solscan Response:', response.data);
+
+        return NextResponse.json(response.data);
+
     } catch (err) {
-        console.error(err)
-        return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 })
+        console.error('Solscan API error:', err);  // Log the error
+        return NextResponse.json({ error: 'Failed to fetch Solscan data', details: err.message }, { status: 500 });
     }
 }
