@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { QueryProviders } from "@/components/providers/QueryProvider";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Poppins({
@@ -24,10 +23,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.className} antialiased`}
       >
-        <QueryProviders>
-          <Toaster position="bottom-right" />
-          {children}
-        </QueryProviders>
+        <Toaster position="bottom-right" />
+        {children}
       </body>
     </html>
   );

@@ -1,19 +1,36 @@
 "use client"
 
-import { useState } from "react"
-import { Bell, ChevronDown, Menu } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { WhaleLeaderboard } from "./Whale-Leaderboard"
 import { SideNav } from "./Side-Nav"
 import { StatCard } from "./Stats-Card"
 import { useMobile } from "@/hooks/use-mobile"
+import axios from 'axios'
 
 export function DashboardPage() {
   const isMobile = useMobile()
-  const [activeTab, setActiveTab] = useState("leaderboard")
+  const [activeTab, setActiveTab] = useState("leaderboard");
+  const [whales, setWhales] = useState([])
+
+  useEffect(() => {
+    const fetchWhales = async () => {
+      try {
+        const res = await axios.get('/api/whales')
+        setWhales(res.data);
+      } catch (err) {
+        console.error('Error fetching whales:', err)
+      }
+    }
+    fetchWhales();
+  }, [])
+
+  if (whales) {
+    console.log(whales);
+  }
 
   return (
     <div className="flex min-h-screen bg-black">
