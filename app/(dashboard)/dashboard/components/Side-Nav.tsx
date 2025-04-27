@@ -15,7 +15,7 @@ export function SideNav({ activeTab, setActiveTab }: SideNavProps) {
   ];
 
   return (
-    <div className="flex h-screen w-64 flex-col border-r border-gray-800 bg-gray-900">
+    <div className="flex min-h-screen w-64 flex-col border-r border-gray-800 bg-gray-900">
       <div className="flex items-center gap-2 border-b border-gray-800 p-4">
         <Link href={"/"}>
           <h1 className="text-lg font-bold text-white">Solanautics</h1>
