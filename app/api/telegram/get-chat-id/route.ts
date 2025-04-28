@@ -3,10 +3,15 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
   try {
-    // ✅ No need to fetch any userId from URL anymore
-    // ✅ Just check if any Telegram chat exists
+    const searchParams = new URL(req.url).searchParams;
+    const userId = searchParams.get('userId'); // ✅ get userId from frontend query
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+    }
+
     const telegramChat = await prisma.telegramChat.findFirst({
-      orderBy: { createdAt: 'desc' }, // Get the latest connected chat if multiple
+      where: { userId }, // ✅ Find TelegramChat for that specific user
     });
 
     if (!telegramChat) {

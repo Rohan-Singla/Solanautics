@@ -20,45 +20,44 @@ export function DashboardPage_priceAlerts() {
   const [userId, setUserId] = useState<string>('');
   const [connectedToastShown, setConnectedToastShown] = useState(false);
 
-  // Fetch from localstorage initially
   useEffect(() => {
-    const chatId = localStorage.getItem('telegramChatId');
-    if (chatId) {
-      setUserId(chatId);
+    // Try loading from local storage immediately
+    const existingChatId = localStorage.getItem('telegramChatId');
+    if (existingChatId) {
+      setUserId(existingChatId);
+    } else {
+      checkTelegramChatId(); // no chat id? check server
     }
   }, []);
 
   const checkTelegramChatId = async () => {
-    if (!userId) {
-      try {
-        const response = await fetch('/api/telegram/get-chat-id');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.chatId) {
-            setUserId(data.chatId);
-            localStorage.setItem('telegramChatId', data.chatId);
-            setShowTelegramModal(false);
-            if (!connectedToastShown) {
-              alert('✅ Connected to Telegram!');
-              setConnectedToastShown(true);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('❌ Error fetching Telegram Chat ID:', error);
+    try {
+      const response = await fetch(`/api/price-alerts/telegram/get-chat-id`);
+      console.log(response);
+      if (!response.ok) {
+        console.warn('No chatId found yet.');
+        return; // No chat linked yet
       }
+
+      const data = await response.json();
+      if (data.chatId) {
+        localStorage.setItem('telegramChatId', data.chatId);
+        setUserId(data.chatId);
+        if (!connectedToastShown) {
+          alert('✅ Connected to Telegram successfully!');
+          setConnectedToastShown(true);
+        }
+        setShowTelegramModal(false);
+      }
+    } catch (error) {
+      console.error('❌ Error checking Telegram chatId:', error);
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(checkTelegramChatId, 5000);
-    return () => clearInterval(interval);
-  }, [userId, connectedToastShown]);
-
-  const handleFormSubmit = async (data: any) => {
+  const handleFormSubmit = async (formData: any) => {
     const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
     if (!token) {
-      console.error('Solscan API token is missing');
+      alert('❌ Solscan API key missing.');
       return;
     }
 
@@ -74,22 +73,28 @@ export function DashboardPage_priceAlerts() {
         ? '/api/price-alerts/set/price-alert'
         : '/api/price-alerts/set/range-alert';
 
-    const payload = { ...data, userId };
-
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', token },
-        body: JSON.stringify(payload),
+        headers: {
+          'Content-Type': 'application/json',
+          token,
+        },
+        body: JSON.stringify({ ...formData, userId }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit alert');
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to set alert');
+      }
+
       const result = await response.json();
-      console.log('✅ API Response:', result);
-      alert('✅ Alert set successfully!');
-    } catch (error) {
-      console.error('❌ Error submitting alert:', error);
-      alert('❌ Failed to set alert.');
+      console.log('✅ Alert set successfully:', result);
+      alert('✅ Alert created successfully!');
+      setSelectedAlert(null);
+    } catch (error: any) {
+      console.error('❌ Error setting alert:', error.message);
+      alert(`❌ ${error.message || 'Failed to create alert.'}`);
     }
   };
 

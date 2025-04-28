@@ -126,7 +126,9 @@ exports.Prisma.PriceAlertScalarFieldEnum = {
   maxPrice: 'maxPrice',
   createdAt: 'createdAt',
   userId: 'userId',
-  chatId: 'chatId'
+  chatId: 'chatId',
+  triggeredAt: 'triggeredAt',
+  lastPriceNotified: 'lastPriceNotified'
 };
 
 exports.Prisma.TelegramChatScalarFieldEnum = {

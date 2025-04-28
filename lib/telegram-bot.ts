@@ -1,7 +1,8 @@
 // lib/telegram-bot.ts
-
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 import { prisma } from './prisma';
+import "@/lib/telegram-bot"; // fine inside runner only
+
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -14,41 +15,39 @@ const bot = new TelegramBot(token, { polling: true });
 
 bot.onText(/\/start/, async (msg: Message) => {
   const chatId = msg.chat.id.toString();
-  const userId = chatId; // We treat Telegram chatId as userId for simplicity
+  const userId = chatId; // Telegram chatId = userId
 
   console.log('🔔 /start received from chatId:', chatId);
 
   try {
-    // Check if chat already exists
-    const existingChat = await prisma.telegramChat.findUnique({ where: { chatId } });
+  
+    const existingChat = await prisma.telegramChat.findFirst({ where: { chatId } });
 
     if (!existingChat) {
       console.log('➕ No existing chat found. Creating TelegramChat...');
       await prisma.telegramChat.create({
-        data: {
-          userId,
-          chatId,
-        },
+        data: { userId, chatId },
       });
       console.log('✅ Created TelegramChat entry.');
     } else {
       console.log('ℹ️ Chat already exists. Skipping creation.');
     }
 
-    // Link chatId to existing alerts without chatId
+    // 🔗 Link chatId to any price alerts without chatId
     await prisma.priceAlert.updateMany({
       where: { userId, chatId: null },
       data: { chatId },
     });
-    console.log('🔗 Linked chatId to price alerts if any.');
+    console.log('🔗 Linked chatId to price alerts.');
 
-    // Send welcome message
+    // 📩 Send welcome message
     await bot.sendMessage(
       chatId,
-      `🚀 You're now connected to Solanautics Alerts! We'll notify you when your alert triggers.`
+      `🚀 You are now connected to Solanautics Alerts! You'll receive price notifications.`
     );
-  } catch (error) {
-    console.error('❌ Error during /start processing:', error);
+  } catch (error: any) {
+    console.error('❌ Error during /start processing:', error.message);
+    await bot.sendMessage(chatId, '❌ Failed to connect you. Please try again later.');
   }
 });
 

@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import "@/lib/bot-loader"; 
+//import "@/lib/bot-loader"; 
 
 
 export async function POST(req: Request) {

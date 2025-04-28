@@ -1,2 +1,2 @@
 // lib/bot-loader.ts
-import "@/lib/telegram-bot";
+//import "@/lib/telegram-bot";

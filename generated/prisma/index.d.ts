@@ -1025,6 +1025,7 @@ export namespace Prisma {
     duration: number | null
     minPrice: number | null
     maxPrice: number | null
+    lastPriceNotified: number | null
   }
 
   export type PriceAlertSumAggregateOutputType = {
@@ -1032,6 +1033,7 @@ export namespace Prisma {
     duration: number | null
     minPrice: number | null
     maxPrice: number | null
+    lastPriceNotified: number | null
   }
 
   export type PriceAlertMinAggregateOutputType = {
@@ -1044,6 +1046,8 @@ export namespace Prisma {
     createdAt: Date | null
     userId: string | null
     chatId: string | null
+    triggeredAt: Date | null
+    lastPriceNotified: number | null
   }
 
   export type PriceAlertMaxAggregateOutputType = {
@@ -1056,6 +1060,8 @@ export namespace Prisma {
     createdAt: Date | null
     userId: string | null
     chatId: string | null
+    triggeredAt: Date | null
+    lastPriceNotified: number | null
   }
 
   export type PriceAlertCountAggregateOutputType = {
@@ -1068,6 +1074,8 @@ export namespace Prisma {
     createdAt: number
     userId: number
     chatId: number
+    triggeredAt: number
+    lastPriceNotified: number
     _all: number
   }
 
@@ -1077,6 +1085,7 @@ export namespace Prisma {
     duration?: true
     minPrice?: true
     maxPrice?: true
+    lastPriceNotified?: true
   }
 
   export type PriceAlertSumAggregateInputType = {
@@ -1084,6 +1093,7 @@ export namespace Prisma {
     duration?: true
     minPrice?: true
     maxPrice?: true
+    lastPriceNotified?: true
   }
 
   export type PriceAlertMinAggregateInputType = {
@@ -1096,6 +1106,8 @@ export namespace Prisma {
     createdAt?: true
     userId?: true
     chatId?: true
+    triggeredAt?: true
+    lastPriceNotified?: true
   }
 
   export type PriceAlertMaxAggregateInputType = {
@@ -1108,6 +1120,8 @@ export namespace Prisma {
     createdAt?: true
     userId?: true
     chatId?: true
+    triggeredAt?: true
+    lastPriceNotified?: true
   }
 
   export type PriceAlertCountAggregateInputType = {
@@ -1120,6 +1134,8 @@ export namespace Prisma {
     createdAt?: true
     userId?: true
     chatId?: true
+    triggeredAt?: true
+    lastPriceNotified?: true
     _all?: true
   }
 
@@ -1219,6 +1235,8 @@ export namespace Prisma {
     createdAt: Date
     userId: string
     chatId: string | null
+    triggeredAt: Date | null
+    lastPriceNotified: number | null
     _count: PriceAlertCountAggregateOutputType | null
     _avg: PriceAlertAvgAggregateOutputType | null
     _sum: PriceAlertSumAggregateOutputType | null
@@ -1250,6 +1268,8 @@ export namespace Prisma {
     createdAt?: boolean
     userId?: boolean
     chatId?: boolean
+    triggeredAt?: boolean
+    lastPriceNotified?: boolean
     telegramChat?: boolean | PriceAlert$telegramChatArgs<ExtArgs>
   }, ExtArgs["result"]["priceAlert"]>
 
@@ -1263,6 +1283,8 @@ export namespace Prisma {
     createdAt?: boolean
     userId?: boolean
     chatId?: boolean
+    triggeredAt?: boolean
+    lastPriceNotified?: boolean
     telegramChat?: boolean | PriceAlert$telegramChatArgs<ExtArgs>
   }, ExtArgs["result"]["priceAlert"]>
 
@@ -1276,6 +1298,8 @@ export namespace Prisma {
     createdAt?: boolean
     userId?: boolean
     chatId?: boolean
+    triggeredAt?: boolean
+    lastPriceNotified?: boolean
     telegramChat?: boolean | PriceAlert$telegramChatArgs<ExtArgs>
   }, ExtArgs["result"]["priceAlert"]>
 
@@ -1289,9 +1313,11 @@ export namespace Prisma {
     createdAt?: boolean
     userId?: boolean
     chatId?: boolean
+    triggeredAt?: boolean
+    lastPriceNotified?: boolean
   }
 
-  export type PriceAlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "threshold" | "duration" | "minPrice" | "maxPrice" | "createdAt" | "userId" | "chatId", ExtArgs["result"]["priceAlert"]>
+  export type PriceAlertOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "type" | "threshold" | "duration" | "minPrice" | "maxPrice" | "createdAt" | "userId" | "chatId" | "triggeredAt" | "lastPriceNotified", ExtArgs["result"]["priceAlert"]>
   export type PriceAlertInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     telegramChat?: boolean | PriceAlert$telegramChatArgs<ExtArgs>
   }
@@ -1317,6 +1343,8 @@ export namespace Prisma {
       createdAt: Date
       userId: string
       chatId: string | null
+      triggeredAt: Date | null
+      lastPriceNotified: number | null
     }, ExtArgs["result"]["priceAlert"]>
     composites: {}
   }
@@ -1750,6 +1778,8 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"PriceAlert", 'DateTime'>
     readonly userId: FieldRef<"PriceAlert", 'String'>
     readonly chatId: FieldRef<"PriceAlert", 'String'>
+    readonly triggeredAt: FieldRef<"PriceAlert", 'DateTime'>
+    readonly lastPriceNotified: FieldRef<"PriceAlert", 'Float'>
   }
     
 
@@ -3310,7 +3340,9 @@ export namespace Prisma {
     maxPrice: 'maxPrice',
     createdAt: 'createdAt',
     userId: 'userId',
-    chatId: 'chatId'
+    chatId: 'chatId',
+    triggeredAt: 'triggeredAt',
+    lastPriceNotified: 'lastPriceNotified'
   };
 
   export type PriceAlertScalarFieldEnum = (typeof PriceAlertScalarFieldEnum)[keyof typeof PriceAlertScalarFieldEnum]
@@ -3442,6 +3474,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PriceAlert"> | Date | string
     userId?: StringFilter<"PriceAlert"> | string
     chatId?: StringNullableFilter<"PriceAlert"> | string | null
+    triggeredAt?: DateTimeNullableFilter<"PriceAlert"> | Date | string | null
+    lastPriceNotified?: FloatNullableFilter<"PriceAlert"> | number | null
     telegramChat?: XOR<TelegramChatNullableScalarRelationFilter, TelegramChatWhereInput> | null
   }
 
@@ -3455,6 +3489,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     chatId?: SortOrderInput | SortOrder
+    triggeredAt?: SortOrderInput | SortOrder
+    lastPriceNotified?: SortOrderInput | SortOrder
     telegramChat?: TelegramChatOrderByWithRelationInput
   }
 
@@ -3471,6 +3507,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PriceAlert"> | Date | string
     userId?: StringFilter<"PriceAlert"> | string
     chatId?: StringNullableFilter<"PriceAlert"> | string | null
+    triggeredAt?: DateTimeNullableFilter<"PriceAlert"> | Date | string | null
+    lastPriceNotified?: FloatNullableFilter<"PriceAlert"> | number | null
     telegramChat?: XOR<TelegramChatNullableScalarRelationFilter, TelegramChatWhereInput> | null
   }, "id">
 
@@ -3484,6 +3522,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     chatId?: SortOrderInput | SortOrder
+    triggeredAt?: SortOrderInput | SortOrder
+    lastPriceNotified?: SortOrderInput | SortOrder
     _count?: PriceAlertCountOrderByAggregateInput
     _avg?: PriceAlertAvgOrderByAggregateInput
     _max?: PriceAlertMaxOrderByAggregateInput
@@ -3504,6 +3544,8 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"PriceAlert"> | Date | string
     userId?: StringWithAggregatesFilter<"PriceAlert"> | string
     chatId?: StringNullableWithAggregatesFilter<"PriceAlert"> | string | null
+    triggeredAt?: DateTimeNullableWithAggregatesFilter<"PriceAlert"> | Date | string | null
+    lastPriceNotified?: FloatNullableWithAggregatesFilter<"PriceAlert"> | number | null
   }
 
   export type TelegramChatWhereInput = {
@@ -3572,6 +3614,8 @@ export namespace Prisma {
     maxPrice?: number | null
     createdAt?: Date | string
     userId: string
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
     telegramChat?: TelegramChatCreateNestedOneWithoutPriceAlertsInput
   }
 
@@ -3585,6 +3629,8 @@ export namespace Prisma {
     createdAt?: Date | string
     userId: string
     chatId?: string | null
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
   }
 
   export type PriceAlertUpdateInput = {
@@ -3596,6 +3642,8 @@ export namespace Prisma {
     maxPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
     telegramChat?: TelegramChatUpdateOneWithoutPriceAlertsNestedInput
   }
 
@@ -3609,6 +3657,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
     chatId?: NullableStringFieldUpdateOperationsInput | string | null
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type PriceAlertCreateManyInput = {
@@ -3621,6 +3671,8 @@ export namespace Prisma {
     createdAt?: Date | string
     userId: string
     chatId?: string | null
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
   }
 
   export type PriceAlertUpdateManyMutationInput = {
@@ -3632,6 +3684,8 @@ export namespace Prisma {
     maxPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type PriceAlertUncheckedUpdateManyInput = {
@@ -3644,6 +3698,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
     chatId?: NullableStringFieldUpdateOperationsInput | string | null
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type TelegramChatCreateInput = {
@@ -3773,6 +3829,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type TelegramChatNullableScalarRelationFilter = {
     is?: TelegramChatWhereInput | null
     isNot?: TelegramChatWhereInput | null
@@ -3793,6 +3860,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     chatId?: SortOrder
+    triggeredAt?: SortOrder
+    lastPriceNotified?: SortOrder
   }
 
   export type PriceAlertAvgOrderByAggregateInput = {
@@ -3800,6 +3869,7 @@ export namespace Prisma {
     duration?: SortOrder
     minPrice?: SortOrder
     maxPrice?: SortOrder
+    lastPriceNotified?: SortOrder
   }
 
   export type PriceAlertMaxOrderByAggregateInput = {
@@ -3812,6 +3882,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     chatId?: SortOrder
+    triggeredAt?: SortOrder
+    lastPriceNotified?: SortOrder
   }
 
   export type PriceAlertMinOrderByAggregateInput = {
@@ -3824,6 +3896,8 @@ export namespace Prisma {
     createdAt?: SortOrder
     userId?: SortOrder
     chatId?: SortOrder
+    triggeredAt?: SortOrder
+    lastPriceNotified?: SortOrder
   }
 
   export type PriceAlertSumOrderByAggregateInput = {
@@ -3831,6 +3905,7 @@ export namespace Prisma {
     duration?: SortOrder
     minPrice?: SortOrder
     maxPrice?: SortOrder
+    lastPriceNotified?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -3923,6 +3998,20 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -4026,6 +4115,10 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type TelegramChatUpdateOneWithoutPriceAlertsNestedInput = {
@@ -4160,6 +4253,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -4261,6 +4365,20 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -4343,6 +4461,8 @@ export namespace Prisma {
     maxPrice?: number | null
     createdAt?: Date | string
     userId: string
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
   }
 
   export type PriceAlertUncheckedCreateWithoutTelegramChatInput = {
@@ -4354,6 +4474,8 @@ export namespace Prisma {
     maxPrice?: number | null
     createdAt?: Date | string
     userId: string
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
   }
 
   export type PriceAlertCreateOrConnectWithoutTelegramChatInput = {
@@ -4395,6 +4517,8 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"PriceAlert"> | Date | string
     userId?: StringFilter<"PriceAlert"> | string
     chatId?: StringNullableFilter<"PriceAlert"> | string | null
+    triggeredAt?: DateTimeNullableFilter<"PriceAlert"> | Date | string | null
+    lastPriceNotified?: FloatNullableFilter<"PriceAlert"> | number | null
   }
 
   export type PriceAlertCreateManyTelegramChatInput = {
@@ -4406,6 +4530,8 @@ export namespace Prisma {
     maxPrice?: number | null
     createdAt?: Date | string
     userId: string
+    triggeredAt?: Date | string | null
+    lastPriceNotified?: number | null
   }
 
   export type PriceAlertUpdateWithoutTelegramChatInput = {
@@ -4417,6 +4543,8 @@ export namespace Prisma {
     maxPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type PriceAlertUncheckedUpdateWithoutTelegramChatInput = {
@@ -4428,6 +4556,8 @@ export namespace Prisma {
     maxPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
   export type PriceAlertUncheckedUpdateManyWithoutTelegramChatInput = {
@@ -4439,6 +4569,8 @@ export namespace Prisma {
     maxPrice?: NullableFloatFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    triggeredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPriceNotified?: NullableFloatFieldUpdateOperationsInput | number | null
   }
 
 
