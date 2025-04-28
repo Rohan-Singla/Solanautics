@@ -6,7 +6,7 @@ import axios from 'axios';
 const SOLSCAN_PRICE_URL = process.env.SOLSCAN_PRICE_URL!;
 const TELEGRAM_BOT_LINK = "https://t.me/Solanautics_Alerts_bot";
 
-startAlertCronJob();
+//startAlertCronJob();
 
 async function fetchCurrentSolPrice(): Promise<number | null> {
   try {
@@ -116,8 +116,23 @@ export function startAlertCronJob() {
           }
         }
       }
-
-      // Volatility feature can come later 🔥
+      // Volatility feature 
+      if (type === 'Volatility' && threshold !== null) {
+        if (movementPassed && Math.abs((currentPrice - lastPriceNotified!) / lastPriceNotified!) * 100 >= threshold) {
+          await sendTelegramMessage(
+            chatId,
+            `🌪️ SOL price volatility detected! Price swing > ${threshold}%`
+          );
+          console.log(`✅ Volatility alert triggered for chatId ${chatId}`);
+          await prisma.priceAlert.update({
+            where: { id },
+            data: { triggeredAt: now, lastPriceNotified: currentPrice },
+          });
+        } else {
+          console.log(`💤 No major volatility for alert ${id}.`);
+        }
+      }
+     
     }
   });
 }

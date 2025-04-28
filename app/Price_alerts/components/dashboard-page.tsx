@@ -21,38 +21,38 @@ export function DashboardPage_priceAlerts() {
   const [connectedToastShown, setConnectedToastShown] = useState(false);
 
   useEffect(() => {
-    // Try loading from local storage immediately
-    const existingChatId = localStorage.getItem('telegramChatId');
-    if (existingChatId) {
-      setUserId(existingChatId);
-    } else {
-      checkTelegramChatId(); // no chat id? check server
-    }
-  }, []);
+    const fetchChatId = async () => {
+      try {
+        const existingChatId = localStorage.getItem('telegramChatId');
 
-  const checkTelegramChatId = async () => {
-    try {
-      const response = await fetch(`/api/price-alerts/telegram/get-chat-id`);
-      console.log(response);
-      if (!response.ok) {
-        console.warn('No chatId found yet.');
-        return; // No chat linked yet
-      }
-
-      const data = await response.json();
-      if (data.chatId) {
-        localStorage.setItem('telegramChatId', data.chatId);
-        setUserId(data.chatId);
-        if (!connectedToastShown) {
-          alert('✅ Connected to Telegram successfully!');
-          setConnectedToastShown(true);
+        if (existingChatId) {
+          setUserId(existingChatId);
+          return; // ✅ Already connected, no need to call server
         }
-        setShowTelegramModal(false);
+
+        const response = await fetch(`/api/telegram/get-chat-id`);
+        if (!response.ok) {
+          console.warn('No chatId found yet.');
+          return;
+        }
+
+        const data = await response.json();
+        if (data.chatId) {
+          localStorage.setItem('telegramChatId', data.chatId);
+          setUserId(data.chatId);
+          if (!connectedToastShown) {
+            alert('✅ Connected to Telegram successfully!');
+            setConnectedToastShown(true);
+          }
+          setShowTelegramModal(false);
+        }
+      } catch (error) {
+        console.error('❌ Error fetching chatId:', error);
       }
-    } catch (error) {
-      console.error('❌ Error checking Telegram chatId:', error);
-    }
-  };
+    };
+
+    fetchChatId();
+  }, [connectedToastShown]);
 
   const handleFormSubmit = async (formData: any) => {
     const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;

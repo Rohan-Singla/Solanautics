@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         type: 'Volatility',
         threshold: finalThreshold,
         duration: duration ?? 24,
-        chatId: userId,
+        chatId: telegramChat.chatId,
       },
     });
 
