@@ -1,15 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { SideNav } from "../components/Side-Nav"
-import { StatCard } from "../components/Stats-Card"
-import { WhaleLeaderboard } from "../components/Whale-Leaderboard"
 import { useMobile } from "@/hooks/use-mobile"
-import axios from "axios"
 
 interface DashboardLayoutProps {
   children?: React.ReactNode
@@ -50,7 +46,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       case "all":
         return (
           <>
-            <div className="mb-6 grid gap-4 md:grid-cols-3">
+            {/* <div className="mb-6 grid gap-4 md:grid-cols-3">
               <StatCard
                 title="Total Whales Tracked"
                 value="1,248"
@@ -74,28 +70,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 gradientFrom="from-pink-600"
                 gradientTo="to-purple-600"
               />
-            </div>
-            <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+            </div> */}
+            {/* <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
               <CardHeader className="border-b border-gray-800 pb-3">
                 <CardTitle className="text-xl font-bold text-white">All Whale Activity</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                
               </CardContent>
-            </Card>
+            </Card> */}
           </>
         )
-      case "leaderboard":
-        return (
-          <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
-            <CardHeader className="border-b border-gray-800 pb-3">
-              <CardTitle className="text-xl font-bold text-white">Whale Leaderboard</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
+      // case "leaderboard":
+      //   return (
+      //     <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+      //       <CardHeader className="border-b border-gray-800 pb-3">
+      //         <CardTitle className="text-xl font-bold text-white">Whale Leaderboard</CardTitle>
+      //       </CardHeader>
+      //       <CardContent className="p-0">
              
-            </CardContent>
-          </Card>
-        )
+      //       </CardContent>
+      //     </Card>
+      //   )
       default:
         return null
     }
