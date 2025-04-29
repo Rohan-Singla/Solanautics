@@ -1,4 +1,3 @@
-// app/Price_alerts/layout.tsx
 import { startAlertCronJob } from '@/lib/cron-job';
 import React from 'react';
 

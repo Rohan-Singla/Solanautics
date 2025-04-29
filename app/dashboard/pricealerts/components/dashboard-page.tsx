@@ -4,16 +4,15 @@ import { useState, useEffect } from 'react';
 import { Bell, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { SideNav_price_alert } from './side-nav';
+import { SideNav } from "../../components/Side-Nav"
 import { useMobile } from '@/hooks/use-mobile';
-import { LiveDataCard_price_alert } from './live-data';
 import AlertForm from './set-alerts/alert-form';
 
 type AlertType = 'Price' | 'Volatility' | 'Range' | null;
 
 export function PriceAlerts() {
   const isMobile = useMobile();
-  const [activeTab, setActiveTab] = useState('leaderboard');
+  const [activeTab, setActiveTab] = useState('pricealerts');
   const [selectedAlert, setSelectedAlert] = useState<AlertType>(null);
   const [showTelegramModal, setShowTelegramModal] = useState(false);
   const [userId, setUserId] = useState<string>('');
@@ -54,7 +53,7 @@ export function PriceAlerts() {
   }, [connectedToastShown]);
 
   const handleFormSubmit = async (formData: any) => {
-    const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
+    const token = process.env.SOLSCAN_API_KEY;
     if (!token) {
       alert('❌ Solscan API key missing.');
       return;
@@ -69,8 +68,8 @@ export function PriceAlerts() {
       selectedAlert === 'Volatility'
         ? '/api/price-alerts/set/volatility-alert'
         : selectedAlert === 'Price'
-        ? '/api/price-alerts/set/price-alert'
-        : '/api/price-alerts/set/range-alert';
+          ? '/api/price-alerts/set/price-alert'
+          : '/api/price-alerts/set/range-alert';
 
     try {
       const response = await fetch(endpoint, {
@@ -100,7 +99,7 @@ export function PriceAlerts() {
   return (
     <div className="flex min-h-screen bg-black text-white">
       {!isMobile && (
-        <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
+        <SideNav activeTab={activeTab} setActiveTab={setActiveTab} />
       )}
       <div className="flex-1">
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-800 bg-gray-900/80 px-4 py-3 backdrop-blur-md">
@@ -113,7 +112,7 @@ export function PriceAlerts() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-64 border-gray-800 bg-gray-900 p-0">
-                <SideNav_price_alert activeTab={activeTab} setActiveTab={setActiveTab} />
+                <SideNav activeTab={activeTab} setActiveTab={setActiveTab} />
               </SheetContent>
             </Sheet>
           )}
@@ -121,8 +120,6 @@ export function PriceAlerts() {
         </header>
 
         <main className="px-4 py-6 md:px-6 space-y-6">
-          <LiveDataCard_price_alert />
-
           <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6 shadow-md">
             <h2 className="text-lg font-semibold text-white mb-4 text-center">
               Set Alerts – Don&apos;t wanna miss out on SOL swings?

@@ -11,7 +11,7 @@ const TELEGRAM_BOT_LINK = "https://t.me/Solanautics_Alerts_bot";
 async function fetchCurrentSolPrice(): Promise<number | null> {
   try {
     const res = await axios.get(SOLSCAN_PRICE_URL, {
-      headers: { token: process.env.NEXT_PUBLIC_SOLSCAN_API_KEY! },
+      headers: { token: process.env.SOLSCAN_API_KEY! },
     });
 
     const priceList = res.data?.data;
