@@ -12,7 +12,7 @@ import { WalletTracker } from "./Wallet-Tracker"
 
 export function DashboardPage() {
   const isMobile = useMobile()
-  const [activeTab, setActiveTab] = useState("leaderboard");
+  const [activeTab, setActiveTab] = useState("walletracking");
 
 
   return (
