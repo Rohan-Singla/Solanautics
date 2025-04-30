@@ -40,9 +40,9 @@ const DashPreview = () => {
               <div className="mb-4 h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 p-3">
                 <div className="h-full w-full rounded-full bg-blue-400/50" ><Fish /></div>
               </div>
-              <h3 className="mb-2 text-xl font-bold">Whale Tracking</h3>
+              <h3 className="mb-2 text-xl font-bold">Wallet Tracking</h3>
               <p className="text-white/70">
-                Follow the smart money with real-time alerts on whale movements and positions.
+                Add and track solana wallets transactions 
               </p>
             </motion.div>
 
@@ -58,7 +58,7 @@ const DashPreview = () => {
               </div>
               <h3 className="mb-2 text-xl font-bold">Price Alerts</h3>
               <p className="text-white/70">
-                Real time price $SOL Price tracking , get alerts and notifications to don't miss on opportunities.
+                Real time price $SOL Price tracking , get alerts and notifications on telegram to don't miss on opportunities.
               </p>
             </motion.div>
 
@@ -74,7 +74,7 @@ const DashPreview = () => {
               </div>
               <h3 className="mb-2 text-xl font-bold">Liquidity Pools Tracking</h3>
               <p className="text-white/70">
-                A real-time dashboard that tracks liquidity pools and gives notifications for sudden movements.
+                A dashboard that tracks liquidity pools to keep you updated on opportunities or risks.
               </p>
             </motion.div>
           </div>
