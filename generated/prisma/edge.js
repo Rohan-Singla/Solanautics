@@ -146,7 +146,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Cohort\\Web3\\SolScan\\src\\app\\generated\\prisma",
+      "value": "D:\\Cohort\\Web3\\SolScan\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -164,10 +164,10 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../../.env"
+    "rootEnvPath": "../../.env",
+    "schemaEnvPath": "../../.env"
   },
-  "relativePath": "../../../../prisma",
+  "relativePath": "../../prisma",
   "clientVersion": "6.6.0",
   "engineVersion": "f676762280b54cd07c770017ed3711ddde35f37a",
   "datasourceNames": [
@@ -183,8 +183,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel PriceAlert {\n  id                String        @id @default(uuid())\n  type              AlertType\n  threshold         Float? // Used for 'Price' and 'Volatility'\n  duration          Int? // Used for 'Volatility' (hours)\n  minPrice          Float?\n  maxPrice          Float?\n  createdAt         DateTime      @default(now())\n  userId            String\n  chatId            String?\n  telegramChat      TelegramChat? @relation(\"ChatRelation\", fields: [chatId], references: [chatId])\n  triggeredAt       DateTime?\n  lastPriceNotified Float?\n}\n\nenum AlertType {\n  Price\n  Volatility\n  Range\n}\n\nmodel TelegramChat {\n  id          Int          @id @default(autoincrement())\n  userId      String // Reference to the user (could be your Clerk ID)\n  chatId      String       @unique // Telegram chat ID for sending alerts\n  createdAt   DateTime     @default(now())\n  updatedAt   DateTime     @updatedAt\n  priceAlerts PriceAlert[] @relation(\"ChatRelation\")\n}\n",
-  "inlineSchemaHash": "9bd265969dc645b7907414c25fe60ff5e225183232bfd24b86a02cf3a94bc309",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel PriceAlert {\n  id                String        @id @default(uuid())\n  type              AlertType\n  threshold         Float? // Used for 'Price' and 'Volatility'\n  duration          Int? // Used for 'Volatility' (hours)\n  minPrice          Float?\n  maxPrice          Float?\n  createdAt         DateTime      @default(now())\n  userId            String\n  chatId            String?\n  telegramChat      TelegramChat? @relation(\"ChatRelation\", fields: [chatId], references: [chatId])\n  triggeredAt       DateTime?\n  lastPriceNotified Float?\n}\n\nenum AlertType {\n  Price\n  Volatility\n  Range\n}\n\nmodel TelegramChat {\n  id          Int          @id @default(autoincrement())\n  userId      String // Reference to the user (could be your Clerk ID)\n  chatId      String       @unique // Telegram chat ID for sending alerts\n  createdAt   DateTime     @default(now())\n  updatedAt   DateTime     @updatedAt\n  priceAlerts PriceAlert[] @relation(\"ChatRelation\")\n}\n",
+  "inlineSchemaHash": "0b6146149a27cbda000f8739a740f6fa064db860200d507c8c8a0b18b26e34a7",
   "copyEngine": true
 }
 config.dirname = '/'

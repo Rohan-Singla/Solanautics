@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Bell, Zap, TrendingUp, ArrowRight, X } from 'lucide-react';
 import AlertTypeCard from './alert-type';
 import AlertForm from './alert-form';

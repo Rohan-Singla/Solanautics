@@ -13,8 +13,6 @@ import { WalletTracker } from "./Wallet-Tracker"
 export function DashboardPage() {
   const isMobile = useMobile()
   const [activeTab, setActiveTab] = useState("walletracking");
-  const [wallets, setWallets] = useState([]);
-  const [whales, setWhales] = useState([]);
 
   return (
     <div className="flex min-h-screen bg-black">
@@ -45,10 +43,6 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent className="p-0">
               <WalletTracker />
-              <CardTitle className="text-xl font-bold text-white">Track Wallets</CardTitle>
-            </CardContent>
-            <CardContent className="p-0">
-              <WalletTracker/>
               <WhaleLeaderboard />
             </CardContent>
           </Card>
