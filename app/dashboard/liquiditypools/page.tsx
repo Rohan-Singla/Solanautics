@@ -321,7 +321,7 @@ export default function DashboardPage() {
                     <DropdownMenuTrigger asChild>
                         <Button
                             variant="outline"
-                            className="w-full border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
+                            className="w-full border-gray-800 bg-gray-900/50 text-white  h-12 text-sm"
                         >
                             <span className="truncate">
                                 {selectedPoolData
@@ -459,7 +459,7 @@ export default function DashboardPage() {
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="outline"
-                                className="flex-1 border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
+                                className="flex-1 border-gray-800 bg-gray-900/50 text-white  h-12 text-sm"
                             >
                                 Sort by: {sortBy.field.charAt(0).toUpperCase() + sortBy.field.slice(1)}
                                 <ChevronDown className="ml-2 h-5 w-5" />
@@ -479,12 +479,6 @@ export default function DashboardPage() {
                     </DropdownMenu>
                     <Drawer>
                         <DrawerTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="flex-1 border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
-                            >
-                                Filters
-                            </Button>
                         </DrawerTrigger>
                         <DrawerContent className="bg-gray-900 text-white">
                             <div className="mx-auto w-full max-w-sm">
@@ -573,12 +567,12 @@ export default function DashboardPage() {
                             key={pool.pool_address}
                             pool={{
                                 address: shortenAddress(pool.pool_address),
-                                token1: shortenAddress(
+                                token1:
                                     pool.token1 || data.poolDetails[pool.pool_address]?.tokens_info[0]?.token || "Unknown"
-                                ),
-                                token2: shortenAddress(
+                                ,
+                                token2:
                                     pool.token2 || data.poolDetails[pool.pool_address]?.tokens_info[1]?.token || "Unknown"
-                                ),
+                                ,
                                 volume24h: data.poolMetrics[pool.pool_address]?.total_volume_24h || pool.volume_24h,
                                 volumeChange: data.poolMetrics[pool.pool_address]?.total_volume_change_24h || 0,
                                 trades24h: data.poolMetrics[pool.pool_address]?.total_trades_24h || pool.total_trade_24h || 0,
@@ -654,18 +648,12 @@ export default function DashboardPage() {
                                     onValueChange={(value) => setChartMetric(value as "volume" | "trades")}
                                     className="w-full"
                                 >
-                                    <TabsList className="bg-gray-800 w-full grid grid-cols-2">
+                                    <TabsList className="bg-gray-800 w-full  grid grid-cols-1">
                                         <TabsTrigger
                                             value="volume"
-                                            className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+                                            className="data-[state=active]:bg-purple-600  text-gray-200 text-sm py-2"
                                         >
                                             Volume
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="trades"
-                                            className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
-                                        >
-                                            Trades
                                         </TabsTrigger>
                                     </TabsList>
                                 </Tabs>
@@ -784,6 +772,8 @@ export default function DashboardPage() {
                     </table>
                 </div>
             </div>
+
+
         </div>
     );
 }
