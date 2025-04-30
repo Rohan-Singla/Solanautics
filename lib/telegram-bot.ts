@@ -1,9 +1,6 @@
 // lib/telegram-bot.ts
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 import { prisma } from './prisma';
-//import "@/lib/telegram-bot"; // fine inside runner only
-
-
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
 if (!token) {

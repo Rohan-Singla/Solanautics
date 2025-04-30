@@ -1,8 +1,5 @@
-// app/api/price-alerts/set/price-alert-route.ts
-
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-//import "@/lib/bot-loader"; 
 
 
 export async function POST(req: Request) {
@@ -15,7 +12,7 @@ export async function POST(req: Request) {
     }
 
     const telegramChat = await prisma.telegramChat.findFirst({
-      where: { userId },   
+      where: { chatId: userId }
     });
 
     if (!telegramChat) {

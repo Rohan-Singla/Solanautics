@@ -3,9 +3,8 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // ✅ Directly find the most recently created telegram chat
     const telegramChat = await prisma.telegramChat.findFirst({
-      orderBy: { createdAt: 'desc' }, // Get latest connected user
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!telegramChat) {

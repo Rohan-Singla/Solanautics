@@ -10,7 +10,7 @@ export function SideNav({ activeTab, setActiveTab }: SideNavProps) {
   const navItems = [
     { id: "walletracking", label: "Wallet Tracking", icon: Wallet,href:'/dashboard' },
     { id: "pricealerts", label: "Price Alerts", icon: DollarSign,href:'/dashboard/pricealerts'},
-    { id: "pools", label: "Pools Tracking", icon: GroupIcon,href:'/dashboard/liquiditypools' },
+    { id: "liquiditypools", label: "Pools Tracking", icon: GroupIcon,href:'/dashboard/liquiditypools' },
   ];
 
   return (

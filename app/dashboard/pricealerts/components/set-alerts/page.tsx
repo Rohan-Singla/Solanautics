@@ -31,7 +31,7 @@ const SetAlertsPage = () => {
   const [showTelegramPrompt, setShowTelegramPrompt] = useState(false); // State for showing Telegram prompt
 
   const handleFormSubmit = async (data: AlertFormData) => {
-    const token = process.env.NEXT_PUBLIC_SOLSCAN_API_KEY;
+    const token = process.env.SOLSCAN_API_KEY;
     if (!token) {
       alert('Missing Solscan API token.');
       return;
