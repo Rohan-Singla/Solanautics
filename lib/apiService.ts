@@ -1,7 +1,7 @@
 const API_KEY = process.env.SOLSCAN_API_KEY;
 const BASE_URL = 'https://pro-api.solscan.io/v2.0/market';
 
-async function fetchWithAuth(endpoint: string, params: Record<string, string> = {}) {
+async function fetchWithAuth(endpoint: string, params: Record<string, any> = {}) {
   console.log('Fetching data from Solscan API...');
   const url = new URL(`${BASE_URL}${endpoint}`);
   console.log('URL:', url.toString());
@@ -33,7 +33,7 @@ async function fetchWithAuth(endpoint: string, params: Record<string, string> = 
   return response.json();
 }
 
-export async function fetchPoolList(page = 1, pageSize = 10) {
+export async function fetchPoolList(page = 1, pageSize = 100) {
   console.log('Fetching pool list...');
   return fetchWithAuth('/list', {
     page: page.toString(),
@@ -45,10 +45,15 @@ export async function fetchPoolList(page = 1, pageSize = 10) {
 
 export async function fetchPoolDetails(poolAddress: string) {
   console.log('Fetching pool details...');
-  return fetchWithAuth(`/pool/${poolAddress}`);
+  return fetchWithAuth('/info', {
+    address: poolAddress,
+  });
 }
 
 export async function fetchPoolMetrics(poolAddress: string) {
   console.log('Fetching pool metrics...');
-  return fetchWithAuth(`/pool/${poolAddress}/metrics`);
+  return fetchWithAuth('/volume', {
+    address: poolAddress,
+    time: ['20250301', '20250310'], // this will be sent as time[]=...&time[]=...
+  });
 }

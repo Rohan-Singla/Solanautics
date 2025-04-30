@@ -14,18 +14,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  posts Post[]
+model PriceAlert {
+  id                String        @id @default(uuid())
+  type              AlertType
+  threshold         Float? // Used for 'Price' and 'Volatility'
+  duration          Int? // Used for 'Volatility' (hours)
+  minPrice          Float?
+  maxPrice          Float?
+  createdAt         DateTime      @default(now())
+  userId            String
+  chatId            String?
+  telegramChat      TelegramChat? @relation("ChatRelation", fields: [chatId], references: [chatId])
+  triggeredAt       DateTime?
+  lastPriceNotified Float?
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  authorId  Int
-  author    User    @relation(fields: [authorId], references: [id])
+enum AlertType {
+  Price
+  Volatility
+  Range
+}
+
+model TelegramChat {
+  id          Int          @id @default(autoincrement())
+  userId      String // Reference to the user (could be your Clerk ID)
+  chatId      String       @unique // Telegram chat ID for sending alerts
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  priceAlerts PriceAlert[] @relation("ChatRelation")
 }

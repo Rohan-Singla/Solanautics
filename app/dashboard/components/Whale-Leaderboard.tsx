@@ -52,15 +52,6 @@ export function WhaleLeaderboard() {
     localStorage.setItem("tracked_wallets", JSON.stringify(updatedWhales));
   };
 
-  const handleAddWallet = (newWallet: WhaleData) => {
-    // Add the new wallet to the whales array
-    const updatedWhales = [...whales, newWallet];
-    setWhales(updatedWhales);
-
-    // Update local storage immediately
-    localStorage.setItem("tracked_wallets", JSON.stringify(updatedWhales));
-  };
-
   useEffect(() => {
     loadWhalesFromLocalStorage();
 

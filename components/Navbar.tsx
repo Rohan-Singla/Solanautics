@@ -11,16 +11,7 @@ const Navbar = () => {
                 </div>
                 <nav className="hidden md:flex md:gap-6">
                     <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
-                        About
-                    </Link>
-                    <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
                         Features
-                    </Link>
-                    <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
-                        How it Works
-                    </Link>
-                    <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
-                        Upcoming Plans
                     </Link>
                     <Link href="#" className="text-md text-white/70 transition-colors hover:text-white">
                         Team

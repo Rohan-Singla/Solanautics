@@ -2,6 +2,7 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Bell, LineChart, TrendingUp, Zap } from 'lucide-react'
+import Link from 'next/link'
 const Hero = () => {
     return (
         <section className="relative overflow-hidden bg-zinc-950 py-20 md:py-32 w-full">
@@ -17,17 +18,18 @@ const Hero = () => {
                                 Smart Money Tracking
                             </div>
                             <h1 className="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-6xl">
-                                Track Smart Money <span className="text-cyan-400">Movements</span> in Real-Time
+                                Track Smart Money <span className="text-cyan-400">Movements</span> and get updates
                             </h1>
                             <p className="max-w-[600px] text-zinc-400 md:text-xl">
-                                A real-time dashboard & alert bot that tracks and detects liquidity manipulations , whales , SOL price and alerts traders when
-                                opportunities or risks arise on <b>Solana</b> .
+                                Get alerts and notifications in your dashboard about liquidity pools,Price Alerts and track wallet txs on  <b>Solana</b> .
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row">
-                            <Button size="lg" className="bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer">
-                                Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
+                            <Link href={"/dashboard"}>
+                                <Button size="lg" className="bg-cyan-600 text-white hover:bg-cyan-700 cursor-pointer">
+                                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </Link>
                             <Button
                                 size="lg"
                                 variant="secondary"
@@ -39,15 +41,15 @@ const Hero = () => {
                         <div className="flex items-center gap-8">
                             <div className="flex items-center gap-2">
                                 <TrendingUp className="h-5 w-5 text-cyan-400" />
-                                <span className="text-sm text-zinc-400">Real-time tracking</span>
+                                <span className="text-sm text-zinc-400">Wallet Tracking</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Bell className="h-5 w-5 text-cyan-400" />
-                                <span className="text-sm text-zinc-400">Instant alerts</span>
+                                <span className="text-sm text-zinc-400">Price Alerts</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <LineChart className="h-5 w-5 text-cyan-400" />
-                                <span className="text-sm text-zinc-400">Market insights</span>
+                                <span className="text-sm text-zinc-400">Pools Tracking and notifications</span>
                             </div>
                         </div>
                     </div>

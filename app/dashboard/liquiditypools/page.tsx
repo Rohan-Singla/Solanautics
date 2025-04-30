@@ -3,8 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import {
     AlertCircle,
-    ArrowUpDown,
-    Bell,
     ChevronDown,
     ExternalLink,
     Search,
@@ -38,7 +36,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { PoolMetricsChart } from "@/components/pool-metrics-chart";
 import { PoolCard } from "@/components/pool-card";
 import { PoolCardSkeleton } from "@/components/pool-card-skeleton"; // Ensure this file exists or update the path
@@ -787,57 +784,6 @@ export default function DashboardPage() {
                     </table>
                 </div>
             </div>
-
-            {/* Configure Alerts Section */}
-            <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
-                <CardHeader>
-                    <CardTitle className="text-lg text-white">
-                        <div className="flex items-center">
-                            <Bell className="mr-2 h-5 w-5 text-purple-500" />
-                            Configure Alerts
-                        </div>
-                    </CardTitle>
-                    <CardDescription className="text-gray-400 text-sm">
-                        Set up notifications for important pool events
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 rounded-xl bg-gray-800">
-                            <h3 className="font-medium mb-2 text-white text-sm">Price Alerts</h3>
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-300 text-sm">SOL price change (±5%)</span>
-                                    <Switch />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-300 text-sm">USDC price change (±1%)</span>
-                                    <Switch defaultChecked />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="p-4 rounded-xl bg-gray-800">
-                            <h3 className="font-medium mb-2 text-white text-sm">Volume Alerts</h3>
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-300 text-sm">Volume spike ({">"}50%)</span>
-                                    <Switch defaultChecked />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-gray-300 text-sm">Volume drop ({">"}30%)</span>
-                                    <Switch />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <Separator className="my-4 bg-gray-800" />
-                    <div className="flex justify-end">
-                        <Button className="bg-purple-600 hover:bg-purple-700 h-12 text-sm px-6">
-                            Save Alert Preferences
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 }
