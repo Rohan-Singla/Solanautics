@@ -1,4 +1,4 @@
-# APTURA
+# Solanautics
 
 Solanautics is an tool built using Solscan which helps you stay updated , track wallets , smart money tracking , price alerts
 
