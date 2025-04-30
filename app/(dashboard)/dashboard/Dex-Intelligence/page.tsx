@@ -1,741 +1,846 @@
-// pages/dex-intelligence.tsx (or your page file)
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { ArrowUpDown, ExternalLink, ChevronDown, AlertTriangle, RefreshCw, Wallet } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+ AlertCircle,
+ ArrowUpDown,
+ Bell,
+ ChevronDown,
+ ExternalLink,
+ Search,
+ Wallet,
+} from "lucide-react";
+import {
+ Card,
+ CardHeader,
+ CardTitle,
+ CardDescription,
+ CardContent,
+} from "@/components/ui/card";
+import {
+ DropdownMenu,
+ DropdownMenuTrigger,
+ DropdownMenuContent,
+ DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+ Drawer,
+ DrawerTrigger,
+ DrawerContent,
+ DrawerHeader,
+ DrawerTitle,
+ DrawerDescription,
+ DrawerFooter,
+ DrawerClose,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { PoolMetricsChart } from "@/components/pool-metrics-chart";
+import { PoolCard } from "@/components/pool-card";
+import { PoolCardSkeleton } from "../../../../components/pool-card-skeleton"; // Ensure this file exists or update the path
 import { useMobile } from "@/hooks/use-mobile";
+import axios from "axios";
 
-// Types for our data
+// Define types (from types/dex.ts)
 interface PoolInfo {
-  pool_address: string;
-  program_id: string;
-  token1?: string;
-  token1_account?: string;
-  token2?: string;
-  token2_account?: string;
-  total_volume_24h?: number;
-  total_trade_24h?: number;
-  created_time?: number;
+ volume_24h: number;
+ pool_address: string;
+ program_id: string;
+ token1?: string;
+ token1_account?: string;
+ token2?: string;
+ token2_account?: string;
+ total_volume_24h?: number;
+ total_trade_24h?: number;
+ created_time?: number;
 }
 
 interface PoolDetails {
-  pool_address: string;
-  program_id: string;
-  tokens_info: {
-    token: string;
-    token_account: string;
-    amount: number;
-  }[];
-  create_tx_hash: string;
-  create_block_time: number;
-  creator: string;
-  lp_token: string;
+ pool_address: string;
+ program_id: string;
+ tokens_info: { token: string; token_account: string; amount: number }[];
+ create_tx_hash: string;
+ create_block_time: number;
+ creator: string;
+ lp_token: string;
 }
 
 interface PoolMetrics {
-  pool_address: string;
-  program_id: string;
-  total_volume_24h: number;
-  total_volume_change_24h: number;
-  total_trades_24h: number;
-  total_trades_change_24h: number;
-  days: {
-    day: number;
-    value: number;
-  }[];
+ pool_address: string;
+ program_id: string;
+ total_volume_24h: number;
+ total_volume_change_24h: number;
+ total_trades_24h: number;
+ total_trades_change_24h: number;
+ days: { day: number; value: number }[];
 }
 
 interface DexData {
-  totalLiquidity: number;
-  volume24h: number;
-  activePools: number;
-  liquidityHistory: { time: string; liquidity: number }[];
-  swapActivity: { name: string; value: number; color: string }[];
-  recentAlerts: {
-    time: string;
-    alert: string;
-    severity: "High" | "Medium" | "Low";
-    dex: string;
-  }[];
-  topPools: PoolInfo[];
-  poolDetails: Record<string, PoolDetails>;
-  poolMetrics: Record<string, PoolMetrics>;
+ topPools: PoolInfo[];
+ poolDetails: Record<string, PoolDetails>;
+ poolMetrics: Record<string, PoolMetrics>;
+ lastUpdated: string;
 }
 
-// Default data for initial render
-const defaultDexData: DexData = {
-  totalLiquidity: 256,
-  volume24h: 84,
-  activePools: 340,
-  liquidityHistory: [
-    { time: "12AM", liquidity: 200 },
-    { time: "3AM", liquidity: 240 },
-    { time: "6AM", liquidity: 280 },
-    { time: "9AM", liquidity: 300 },
-    { time: "12PM", liquidity: 320 },
-    { time: "3PM", liquidity: 400 },
-    { time: "6PM", liquidity: 420 },
-    { time: "9PM", liquidity: 410 },
-  ],
-  swapActivity: [
-    { name: "Buy", value: 65, color: "#4ADE80" },
-    { name: "Sell", value: 35, color: "#F87171" },
-  ],
-  recentAlerts: [
-    {
-      time: "5 mins ago",
-      alert: "Unusual Volume Spike",
-      severity: "High",
-      dex: "Raydium",
-    },
-    {
-      time: "10 mins ago",
-      alert: "Sudden Price Movement",
-      severity: "Medium",
-      dex: "Orca",
-    },
-    {
-      time: "1 hour ago",
-      alert: "Large Arbitrage Detected",
-      severity: "High",
-      dex: "Saber",
-    },
-  ],
-  topPools: [],
-  poolDetails: {},
-  poolMetrics: {},
-};
+interface Alert {
+ time: string;
+ message: string;
+ pool: string;
+ severity: "High" | "Medium" | "Low";
+}
 
-const dexOptions = ["Raydium", "Orca", "Saber"];
-const UPDATE_NOTE = "Data is updated twice daily at 00:00 and 12:00 UTC.";
+export default function DashboardPage() {
+ const isMobile = useMobile();
+ const [isLoading, setIsLoading] = useState(true);
+ const [isLoadingMore, setIsLoadingMore] = useState(false);
+ const [error, setError] = useState<string | null>(null);
+ const [selectedPool, setSelectedPool] = useState<string | null>(null);
+ const [alertFilter, setAlertFilter] = useState("all");
+ const [searchQuery, setSearchQuery] = useState("");
+ const [showAdvanced, setShowAdvanced] = useState(false);
+ const [sortBy, setSortBy] = useState({ field: "volume", direction: "desc" });
+ const [page, setPage] = useState(1);
+ const [chartMetric, setChartMetric] = useState<"volume" | "trades">("volume");
+ const poolsPerPage = 12;
 
-export default function DexIntelligencePage() {
-  const isMobile = useMobile();
-  const [selectedDex, setSelectedDex] = useState(dexOptions[0]);
-  const [dexData, setDexData] = useState<DexData>(defaultDexData);
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
-  const [selectedPool, setSelectedPool] = useState<string | null>(null);
-  const [alertFilter, setAlertFilter] = useState<string>("all");
+ const [data, setData] = useState<DexData>({
+ topPools: [],
+ poolDetails: {},
+ poolMetrics: {},
+ lastUpdated: new Date().toISOString(),
+ });
 
-  // Fetch all data from API
-  const fetchAllData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/fetch-dex-data");
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
-      const { data } = await response.json();
-
-      const pools: PoolInfo[] = data.topPools || [];
-      const poolDetails = data.poolDetails || {};
-      const poolMetrics = data.poolMetrics || {};
-
-      // Calculate totals
-      const totalVolume24h = pools.reduce(
-        (sum: number, pool: PoolInfo) => sum + (pool.total_volume_24h || 0),
-        0
-      );
-      const totalTrades24h = pools.reduce(
-        (sum: number, pool: PoolInfo) => sum + (pool.total_trade_24h || 0),
-        0
-      );
-
-      // Get historical data from first pool's metrics
-      const firstPoolMetrics = poolMetrics[pools[0]?.pool_address];
-      const historyData = firstPoolMetrics?.days?.map((day: { day: { toString: () => string; }; value: number; }) => ({
-        time: new Date(
-          day.day.toString().replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
-        ).toLocaleTimeString([], { hour: "2-digit" }),
-        liquidity: day.value / 1000000,
-      })) || defaultDexData.liquidityHistory;
-
-      // Generate buy/sell ratio based on volume change
-      const buyRatio =
-        pools.length > 0
-          ? Math.min(
-              70,
-              Math.max(30, 50 + (firstPoolMetrics?.total_volume_change_24h || 0) / 10)
-            )
-          : 65;
-
-      setDexData((prev) => ({
-        ...prev,
-        totalLiquidity: totalVolume24h / 1000000,
-        volume24h: totalVolume24h / 1000000,
-        activePools: pools.length,
-        liquidityHistory: historyData,
-        swapActivity: [
-          { name: "Buy", value: buyRatio, color: "#4ADE80" },
-          { name: "Sell", value: 100 - buyRatio, color: "#F87171" },
-        ],
-        recentAlerts: generateAlerts(pools, poolMetrics),
-        topPools: pools,
-        poolDetails,
-        poolMetrics,
-      }));
-
-      setLastUpdated(data.lastUpdated);
-    } catch (error) {
-      console.error("Error fetching Solana DEX data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Manual refresh trigger
-  const refreshData = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/fetch-dex-data", { method: "POST" });
-      if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
-      }
-      const { data } = await response.json();
-
-      const pools: PoolInfo[] = data.topPools || [];
-      const poolDetails = data.poolDetails || {};
-      const poolMetrics = data.poolMetrics || {};
-
-      // Calculate totals
-      const totalVolume24h = pools.reduce(
-        (sum: number, pool: PoolInfo) => sum + (pool.total_volume_24h || 0),
-        0
-      );
-      const totalTrades24h = pools.reduce(
-        (sum: number, pool: PoolInfo) => sum + (pool.total_trade_24h || 0),
-        0
-      );
-
-      // Get historical data from first pool's metrics
-      const firstPoolMetrics = poolMetrics[pools[0]?.pool_address];
-      const historyData = firstPoolMetrics?.days?.map((day: { day: { toString: () => string; }; value: number; }) => ({
-        time: new Date(
-          day.day.toString().replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3")
-        ).toLocaleTimeString([], { hour: "2-digit" }),
-        liquidity: day.value / 1000000,
-      })) || defaultDexData.liquidityHistory;
-
-      // Generate buy/sell ratio based on volume change
-      const buyRatio =
-        pools.length > 0
-          ? Math.min(
-              70,
-              Math.max(30, 50 + (firstPoolMetrics?.total_volume_change_24h || 0) / 10)
-            )
-          : 65;
-
-      setDexData((prev) => ({
-        ...prev,
-        totalLiquidity: totalVolume24h / 1000000,
-        volume24h: totalVolume24h / 1000000,
-        activePools: pools.length,
-        liquidityHistory: historyData,
-        swapActivity: [
-          { name: "Buy", value: buyRatio, color: "#4ADE80" },
-          { name: "Sell", value: 100 - buyRatio, color: "#F87171" },
-        ],
-        recentAlerts: generateAlerts(pools, poolMetrics),
-        topPools: pools,
-        poolDetails,
-        poolMetrics,
-      }));
-
-      setLastUpdated(data.lastUpdated);
-    } catch (error) {
-      console.error("Error refreshing Solana DEX data:", error);
-    } finally {
-      setIsLoading(false);
-    }
+ // Get pool display name
+ const getPoolName = (pool: PoolInfo, details: PoolDetails) => {
+  if (pool.token1 && pool.token2) return `${shortenAddress(pool.token1)}/${shortenAddress(pool.token2)}`;
+  if (details.tokens_info.length >= 2) return `${shortenAddress(details.tokens_info[0].token)}/${shortenAddress(details.tokens_info[1].token)}`;
+  return shortenAddress(pool.pool_address);
   };
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+ // Enhanced shorten address function
+ const shortenAddress = (address: string | undefined) => {
+ if (!address || typeof address !== "string") return "N/A";
+ if (address.length <= 10) return address;
+ return `${address.slice(0, 4)}...${address.slice(-4)}`;
+ };
 
-  // Helper to generate alerts based on metrics
-  const generateAlerts = (
-    pools: PoolInfo[],
-    metrics: Record<string, PoolMetrics>
-  ): { time: string; alert: string; severity: "High" | "Medium" | "Low"; dex: string }[] => {
-    const alerts: { time: string; alert: string; severity: "High" | "Medium" | "Low"; dex: string }[] = [];
+ // Fetch data from API
+ const fetchData = async (isRefresh = false) => {
+ setIsLoading(true);
+ setError(null);
+ try {
+ const response = await axios({
+ method:"POST" ,
+ url: "/api/fetch-dex-data",
+ });
+ if (response.data.success) {
+ setData(response.data.data);
+ if (!selectedPool && response.data.data.topPools.length > 0) {
+ setSelectedPool(response.data.data.topPools[0].pool_address);
+ }
+ } else {
+ throw new Error("API returned unsuccessful response");
+ }
+ } catch (err) {
+ setError("Failed to load data. Please try again.");
+ console.error(err);
+ } finally {
+ setIsLoading(false);
+ }
+ };
 
-    pools.slice(0, 3).forEach((pool) => {
-      const metric = metrics[pool.pool_address];
-      if (!metric) return;
+ // Initial data fetch
+ useEffect(() => {
+ fetchData();
+ }, []);
 
-      if (Math.abs(metric.total_volume_change_24h) > 30) {
-        alerts.push({
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          alert: `Volume ${metric.total_volume_change_24h > 0 ? "spike" : "drop"} in ${pool.token1?.slice(0, 4)}.../${
-            pool.token2?.slice(0, 4)
-          }...`,
-          severity: Math.abs(metric.total_volume_change_24h) > 50 ? "High" : "Medium",
-          dex: selectedDex,
-        });
-      }
-    });
+ // Generate alerts dynamically
+ const alerts = useMemo(() => {
+ const generatedAlerts: Alert[] = [];
+ data.topPools.forEach((pool) => {
+ const metrics = data.poolMetrics[pool.pool_address];
+ const poolName = getPoolName(pool, data.poolDetails[pool.pool_address] || {
+ tokens_info: [],
+ pool_address: "",
+ program_id: "",
+ create_tx_hash: "",
+ create_block_time: 0,
+ creator: "",
+ lp_token: "",
+ });
+ if (metrics?.total_volume_change_24h && metrics.total_volume_change_24h > 50) {
+ generatedAlerts.push({
+ time: new Date().toISOString(),
+ message: `Volume spike detected for ${poolName}`,
+ pool: poolName,
+ severity: "High",
+ });
+ } else if (metrics?.total_volume_change_24h && metrics.total_volume_change_24h > 20) {
+ generatedAlerts.push({
+ time: new Date().toISOString(),
+ message: `Moderate volume increase for ${poolName}`,
+ pool: poolName,
+ severity: "Medium",
+ });
+ }
+ });
+ return generatedAlerts.slice(0, 10);
+ }, [data]);
 
-    return alerts.length > 0 ? alerts : defaultDexData.recentAlerts;
-  };
+ // Filter pools based on search query
+ const filteredPools = useMemo(() => {
+ return data.topPools.filter((pool) => {
+ if (!searchQuery) return true;
+ const searchLower = searchQuery.toLowerCase();
+ return (
+ (pool.token1?.toLowerCase().includes(searchLower) || false) ||
+ (pool.token2?.toLowerCase().includes(searchLower) || false) ||
+ pool.pool_address.toLowerCase().includes(searchLower)
+ );
+ });
+ }, [data.topPools, searchQuery]);
 
-  // Sort handling
-  const handleSort = (column: string) => {
-    // Implement sorting logic here if needed
-  };
+ // Sort pools
+ const sortedPools = useMemo(() => {
+ return [...filteredPools].sort((a, b) => {
+ const direction = sortBy.direction === "asc" ? 1 : -1;
+ switch (sortBy.field) {
+ case "volume":
+ return ((a.total_volume_24h || a.volume_24h) - (b.total_volume_24h || b.volume_24h)) * direction;
+ case "trades":
+ return ((a.total_trade_24h || 0) - (b.total_trade_24h || 0)) * direction;
+ case "age":
+ return ((a.created_time || 0) - (b.created_time || 0)) * direction;
+ default:
+ return 0;
+ }
+ });
+ }, [filteredPools, sortBy]);
 
-  // Filter alerts based on selected severity
-  const filteredAlerts = dexData.recentAlerts.filter((alert) => {
-    if (alertFilter === "all") return true;
-    return alert.severity.toLowerCase() === alertFilter.toLowerCase();
-  });
+ // Paginate pools
+ const paginatedPools = useMemo(() => {
+ const start = (page - 1) * poolsPerPage;
+ return sortedPools.slice(start, start + poolsPerPage);
+ }, [sortedPools, page]);
 
-  return (
-    <div className="space-y-6" id="dex-intelligence">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-xl font-bold text-white">Solana DEX Intelligence</h2>
-          <p className="text-xs text-gray-400 mt-1">{UPDATE_NOTE}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-gray-900 border-gray-700 hover:bg-gray-800 text-white"
-            onClick={refreshData}
-            disabled={isLoading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
-            {isLoading ? "Loading..." : "Refresh Now"}
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="bg-gray-900 border-gray-700 hover:bg-gray-800 text-white">
-                {selectedDex} <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-gray-900 border-gray-700 text-white">
-              {dexOptions.map((dex) => (
-                <DropdownMenuItem key={dex} onClick={() => setSelectedDex(dex)} className="hover:bg-gray-800">
-                  {dex}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+ // Filter alerts
+ const filteredAlerts = useMemo(() => {
+ if (alertFilter === "all") return alerts;
+ return alerts.filter((alert) => alert.severity.toLowerCase() === alertFilter.toLowerCase());
+ }, [alerts, alertFilter]);
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-gray-400">Total Liquidity</CardDescription>
-            <CardTitle className="text-2xl text-white flex items-center">
-              ${dexData.totalLiquidity.toFixed(2)}M
-              <span className="ml-2 text-sm text-green-400 flex items-center">
-                +2.4%
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-xs text-gray-400">
-              {lastUpdated ? `Updated: ${new Date(lastUpdated).toLocaleTimeString()}` : "Loading..."}
-            </div>
-          </CardContent>
-        </Card>
+ // Toggle sort direction or field
+ const handleSort = (field: string) => {
+ if (sortBy.field === field) {
+ setSortBy({ ...sortBy, direction: sortBy.direction === "asc" ? "desc" : "asc" });
+ } else {
+ setSortBy({ field, direction: "desc" });
+ }
+ };
 
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-gray-400">24h Volume</CardDescription>
-            <CardTitle className="text-2xl text-white flex items-center">
-              ${dexData.volume24h.toFixed(2)}M
-              <span className="ml-2 text-sm text-red-400 flex items-center">
-                -1.2%
-              </span>
-            </CardTitle>
-          </CardHeader>
-        </Card>
+ // Load more pools
+ const loadMore = () => {
+ if (page * poolsPerPage < sortedPools.length) {
+ setIsLoadingMore(true);
+ setTimeout(() => {
+ setPage(page + 1);
+ setIsLoadingMore(false);
+ }, 1000);
+ }
+ };
 
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-gray-400">Active Pools</CardDescription>
-            <CardTitle className="text-2xl text-white flex items-center">
-              {dexData.activePools}
-              <span className="ml-2 text-sm text-green-400 flex items-center">
-                +5
-              </span>
-            </CardTitle>
-          </CardHeader>
-        </Card>
-      </div>
+ // Format time
+ const formatTime = (dateString: string | number | Date) => {
+ if (!dateString) return "";
+ const date = new Date(dateString);
+ const hours = date.getHours();
+ const minutes = date.getMinutes();
+ const seconds = date.getSeconds();
+ const ampm = hours >= 12 ? "PM" : "AM";
+ const formattedHours = hours % 12 || 12;
+ const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+ const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+ return `${formattedHours}:${formattedMinutes}:${formattedSeconds} ${ampm}`;
+ };
 
-      {/* Activity Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        {/* Liquidity Chart */}
-        <Card className="bg-gray-900 border-gray-800 lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-white text-lg">Liquidity Over Time</CardTitle>
-            <CardDescription className="text-gray-400">24 hour overview</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={dexData.liquidityHistory} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorLiquidity" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="time" stroke="#6B7280" tick={{ fill: "#9CA3AF" }} />
-                  <YAxis stroke="#6B7280" tick={{ fill: "#9CA3AF" }} tickFormatter={(value) => `$${value}M`} />
-                  <RechartsTooltip
-                    contentStyle={{
-                      backgroundColor: "#18181B",
-                      borderColor: "#3F3F46",
-                      color: "#fff",
-                    }}
-                    formatter={(value) => [`$${value}M`, "Liquidity"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="liquidity"
-                    stroke="#8B5CF6"
-                    strokeWidth={2}
-                    fillOpacity={1}
-                    fill="url(#colorLiquidity)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+ // Get selected pool data
+ const selectedPoolData = useMemo(() => {
+ if (!selectedPool) return null;
+ const pool = data.topPools.find((p) => p.pool_address === selectedPool);
+ if (!pool) return null;
+ console.log("Selected Pool:", pool);
+ console.log("PoolMetrics", data.poolMetrics[pool.pool_address].days);
+ return {
+ pool,
+ details: data.poolDetails[pool.pool_address] || {
+ pool_address: pool.pool_address,
+ program_id: "",
+ tokens_info: [],
+ create_tx_hash: "",
+ create_block_time: 0,
+ creator: "",
+ lp_token: "",
+ },
+ metrics: data.poolMetrics[pool.pool_address] || {
+ pool_address: pool.pool_address,
+ program_id: "",
+ total_volume_24h: 0,
+ total_volume_change_24h: 0,
+ total_trades_24h: 0,
+ total_trades_change_24h: 0,
+ days: [],
+ },
+ };
+ }, [selectedPool, data]);
 
-        {/* Swap Activity Pie Chart */}
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-white text-lg">Swap Activity</CardTitle>
-            <CardDescription className="text-gray-400">Buy vs Sell Percentage</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={dexData.swapActivity}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {dexData.swapActivity.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip
-                    contentStyle={{
-                      backgroundColor: "#18181B",
-                      borderColor: "#3F3F46",
-                      color: "white",
-                    }}
-                    itemStyle={{
-                      color: "white",
-                    }}
-                    labelStyle={{
-                      color: "white",
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+ // Compute chart data from API
+ const chartData = useMemo(() => {
+ if (!selectedPoolData || !selectedPoolData.metrics.days) return [];
+ return selectedPoolData.metrics.days.map((day) => ({
+ date: new Date(day.day * 1000).toISOString(),
+ value: day.value,
+ }));
+ }, [selectedPoolData, chartMetric]);
 
-      {/* Pool List with Details */}
-      <div className="space-y-6">
-        <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-white">Top Liquidity Pools</h3>
-          <Tabs
-            value={selectedPool || "all"}
-            onValueChange={(val) => setSelectedPool(val === "all" ? null : val)}
-            className="w-auto"
-          >
-            <TabsList className="bg-gray-800">
-              <TabsTrigger value="all" className="data-[state=active]:bg-gray-700 text-slate-100">
-                All Pools
-              </TabsTrigger>
-              {dexData.topPools?.slice(0, 3).map((pool) => (
-                <TabsTrigger
-                  key={pool.pool_address}
-                  value={pool.pool_address}
-                  className="data-[state=active]:bg-gray-700 text-slate-100"
-                >
-                  {`${pool.token1?.slice(0, 4)}.../${pool.token2?.slice(0, 4)}...`}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
 
-        {/* Pool Statistics */}
-        {selectedPool && dexData.poolMetrics[selectedPool] && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-gray-400">24h Volume</CardDescription>
-                <CardTitle className="text-2xl text-white">
-                  ${(dexData.poolMetrics[selectedPool].total_volume_24h / 1000000).toFixed(2)}M
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm flex items-center">
-                  {dexData.poolMetrics[selectedPool].total_volume_change_24h > 0 ? (
-                    <span className="text-green-400">
-                      ↑ {dexData.poolMetrics[selectedPool].total_volume_change_24h.toFixed(2)}%
-                    </span>
-                  ) : (
-                    <span className="text-red-400">
-                      ↓ {Math.abs(dexData.poolMetrics[selectedPool].total_volume_change_24h).toFixed(2)}%
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-gray-400">24h Trades</CardDescription>
-                <CardTitle className="text-2xl text-white">
-                  {dexData.poolMetrics[selectedPool].total_trades_24h}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm flex items-center">
-                  {dexData.poolMetrics[selectedPool].total_trades_change_24h > 0 ? (
-                    <span className="text-green-400">
-                      ↑ {dexData.poolMetrics[selectedPool].total_trades_change_24h.toFixed(2)}%
-                    </span>
-                  ) : (
-                    <span className="text-red-400">
-                      ↓ {Math.abs(dexData.poolMetrics[selectedPool].total_trades_change_24h).toFixed(2)}%
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+ if (isLoading && page === 1) {
+ return <div className="text-white text-center">Loading...</div>;
+ }
 
-            {dexData.poolDetails[selectedPool]?.tokens_info.map((token, index) => (
-              <Card key={index} className="bg-gray-900 border-gray-800">
-                <CardHeader className="pb-2">
-                  <CardDescription className="text-gray-400">Token {index + 1}</CardDescription>
-                  <CardTitle className="text-xl text-white">
-                    {token.token.slice(0, 4)}...{token.token.slice(-4)}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-sm text-gray-300">Amount: {token.amount.toFixed(4)}</div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
+ if (error) {
+ return <div className="text-red-500 text-center">{error}</div>;
+ }
 
-        {/* Pool List Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-800 bg-gray-900/80 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-                <th className="whitespace-nowrap px-4 py-3">Pool</th>
-                <th className="whitespace-nowrap px-4 py-3">Tokens</th>
-                <th className="whitespace-nowrap px-4 py-3">24h Volume</th>
-                <th className="whitespace-nowrap px-4 py-3">Trades</th>
-                <th className="whitespace-nowrap px-4 py-3">Change (24h)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800">
-              {dexData.topPools?.map((pool) => {
-                const metrics = dexData.poolMetrics[pool.pool_address];
-                return (
-                  <tr
-                    key={pool.pool_address}
-                    className={`bg-gray-900/30 text-sm text-gray-300 transition-colors hover:bg-gray-800/50 ${
-                      selectedPool === pool.pool_address ? "bg-gray-800/70" : ""
-                    }`}
-                    onClick={() => setSelectedPool(pool.pool_address)}
-                  >
-                    <td className="whitespace-nowrap px-4 py-3">
-                      <a
-                        href={`https://solscan.io/account/${pool.pool_address}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-purple-400 hover:underline flex items-center"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {pool.pool_address.slice(0, 4)}...{pool.pool_address.slice(-4)}
-                        <ExternalLink className="ml-1 h-3 w-3" />
-                      </a>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3">
-                      {pool.token1
-                        ? `${pool.token1.slice(0, 4)}.../${pool.token2?.slice(0, 4)}...`
-                        : "Multiple tokens"}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3">
-                      ${pool.total_volume_24h ? (pool.total_volume_24h / 1000000).toFixed(2) : 0}M
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3">{pool.total_trade_24h || 0}</td>
-                    <td className="whitespace-nowrap px-4 py-3">
-                      {metrics ? (
-                        <div className="flex items-center">
-                          {metrics.total_volume_change_24h > 0 ? (
-                            <span className="text-green-400">
-                              ↑ {metrics.total_volume_change_24h.toFixed(2)}%
-                            </span>
-                          ) : (
-                            <span className="text-red-400">
-                              ↓ {Math.abs(metrics.total_volume_change_24h).toFixed(2)}%
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        "N/A"
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+ return (
+ <div className="container mx-auto max-w-full">
+ {/* Pool Selection Dropdown */}
+ <div className="mb-6">
+ <DropdownMenu>
+ <DropdownMenuTrigger asChild>
+ <Button
+ variant="outline"
+ className="w-full border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
+ >
+ <span className="truncate">
+ {selectedPoolData
+ ? getPoolName(selectedPoolData.pool, selectedPoolData.details)
+ : "Select a Pool"}
+ </span>
+ <ChevronDown className="ml-2 h-5 w-5" />
+ </Button>
+ </DropdownMenuTrigger>
+ <DropdownMenuContent className="bg-gray-900 border-gray-800 text-white max-h-60 overflow-y-auto w-full">
+ {data.topPools.map((pool) => (
+ <DropdownMenuItem
+ key={pool.pool_address}
+ onClick={() => setSelectedPool(pool.pool_address)}
+ className="truncate text-sm py-2"
+ >
+ {getPoolName(pool, data.poolDetails[pool.pool_address] || {
+ tokens_info: [],
+ pool_address: "",
+ program_id: "",
+ create_tx_hash: "",
+ create_block_time: 0,
+ creator: "",
+ lp_token: "",
+ })}
+ </DropdownMenuItem>
+ ))}
+ </DropdownMenuContent>
+ </DropdownMenu>
+ </div>
 
-      {/* Alerts Table */}
-      <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Recent Alerts</h3>
-        <Tabs defaultValue="all" className="w-auto" value={alertFilter} onValueChange={setAlertFilter}>
-          <TabsList className="bg-gray-800">
-            <TabsTrigger value="all" className="data-[state=active]:bg-gray-700 text-slate-100">
-              All
-            </TabsTrigger>
-            <TabsTrigger value="high" className="data-[state=active]:bg-gray-700 text-slate-100">
-              High
-            </TabsTrigger>
-            <TabsTrigger value="medium" className="data-[state=active]:bg-gray-700 text-slate-100">
-              Medium
-            </TabsTrigger>
-            <TabsTrigger value="low" className="data-[state=active]:bg-gray-700 text-slate-100">
-              Low
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+ {/* Pool-Specific Stats Cards */}
+ {selectedPoolData ? (
+ <div className="mb-6 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader className="pb-2">
+ <CardDescription className="text-gray-400 text-xs">Volume 24h</CardDescription>
+ <CardTitle className="text-lg text-white flex items-center">
+ $
+ {selectedPoolData.metrics.total_volume_24h.toLocaleString(undefined, {
+ maximumFractionDigits: 2,
+ })}
+ </CardTitle>
+ </CardHeader>
+ <CardContent>
+ <p className="text-xs text-gray-400">
+ Last updated: {data.lastUpdated ? formatTime(data.lastUpdated) : ""}
+ </p>
+ </CardContent>
+ </Card>
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader className="pb-2">
+ <CardDescription className="text-gray-400 text-xs">Trades 24h</CardDescription>
+ <CardTitle className="text-lg text-white flex items-center">
+ {selectedPoolData.metrics.total_trades_24h.toLocaleString()}
+ </CardTitle>
+ </CardHeader>
+ <CardContent>
+ <p className="text-xs text-gray-400 truncate">
+ {getPoolName(selectedPoolData.pool, selectedPoolData.details)}
+ </p>
+ </CardContent>
+ </Card>
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader className="pb-2">
+ <CardDescription className="text-gray-400 text-xs">Volume Change 24h</CardDescription>
+ <CardTitle className="text-lg text-white flex items-center">
+ {selectedPoolData.metrics.total_volume_change_24h.toFixed(1)}%
+ <span
+ className={`ml-2 text-sm ${
+ selectedPoolData.metrics.total_volume_change_24h >= 0
+ ? "text-green-500"
+ : "text-red-500"
+ }`}
+ >
+ {selectedPoolData.metrics.total_volume_change_24h >= 0 ? "↑" : "↓"}
+ </span>
+ </CardTitle>
+ </CardHeader>
+ <CardContent>
+ <p className="text-xs text-gray-400">Compared to previous 24h</p>
+ </CardContent>
+ </Card>
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader className="pb-2">
+ <CardDescription className="text-gray-400 text-xs">Trades Change 24h</CardDescription>
+ <CardTitle className="text-lg text-white flex items-center">
+ {selectedPoolData.metrics.total_trades_change_24h.toFixed(1)}%
+ <span
+ className={`ml-2 text-sm ${
+ selectedPoolData.metrics.total_trades_change_24h >= 0
+ ? "text-green-500"
+ : "text-red-500"
+ }`}
+ >
+ {selectedPoolData.metrics.total_trades_change_24h >= 0 ? "↑" : "↓"}
+ </span>
+ </CardTitle>
+ </CardHeader>
+ <CardContent>
+ <p className="text-xs text-gray-400">Compared to previous 24h</p >
+ </CardContent>
+ </Card>
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader className="pb-2">
+ <CardDescription className="text-gray-400 text-xs">Creation Transaction</CardDescription>
+ <CardTitle className="text-lg text-white">
+ {shortenAddress(selectedPoolData.details.create_tx_hash)}
+ </CardTitle>
+ </CardHeader>
+ <CardContent>
+ <p className="text-xs text-gray-400">
+ Created: {new Date(selectedPoolData.details.create_block_time * 1000).toLocaleDateString()}
+ </p>
+ </CardContent>
+ </Card>
+ </div>
+ ) : (
+ <div className="mb-6 p-4 bg-yellow-900/50 text-yellow-400 rounded-md text-center">
+ Please select a pool to view its statistics.
+ </div>
+ )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-800 bg-gray-900/80 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
-              <th className="whitespace-nowrap px-4 py-3">
-                <button className="flex items-center gap-1" onClick={() => handleSort("time")}>
-                  Time
-                  <ArrowUpDown className="h-3 w-3" />
-                </button>
-              </th>
-              <th className="whitespace-nowrap px-4 py-3">
-                <button className="flex items-center gap-1" onClick={() => handleSort("alert")}>
-                  Alert
-                  <ArrowUpDown className="h-3 w-3" />
-                </button>
-              </th>
-              {!isMobile && (
-                <th className="whitespace-nowrap px-4 py-3">
-                  <button className="flex items-center gap-1" onClick={() => handleSort("dex")}>
-                    DEX
-                    <ArrowUpDown className="h-3 w-3" />
-                  </button>
-                </th>
-              )}
-              <th className="whitespace-nowrap px-4 py-3">
-                <button className="flex items-center gap-1" onClick={() => handleSort("severity")}>
-                  Severity
-                  <ArrowUpDown className="h-3 w-3" />
-                </button>
-              </th>
-              <th className="whitespace-nowrap px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800">
-            {filteredAlerts.map((alert, index) => (
-              <tr
-                key={index}
-                className="bg-gray-900/30 text-sm text-gray-300 transition-colors hover:bg-gray-800/50"
-              >
-                <td className="whitespace-nowrap px-4 py-3">{alert.time}</td>
-                <td className="whitespace-nowrap px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-500" />
-                    <span className="font-medium text-white">{alert.alert}</span>
-                  </div>
-                </td>
-                {!isMobile && (
-                  <td className="whitespace-nowrap px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Wallet className="h-4 w-4 text-blue-400" />
-                      <span>{alert.dex}</span>
-                    </div>
-                  </td>
-                )}
-                <td className="whitespace-nowrap px-4 py-3">
-                  <Badge
-                    variant="outline"
-                    className={
-                      alert.severity === "High"
-                        ? "border-red-500 text-red-400 bg-red-950/30"
-                        : alert.severity === "Medium"
-                        ? "border-amber-500 text-amber-400 bg-amber-950/30"
-                        : "border-blue-500 text-blue-400 bg-blue-950/30"
-                    }
-                  >
-                    {alert.severity}
-                  </Badge>
-                </td>
-                <td className="whitespace-nowrap px-4 py-3 text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
-                  >
-                    View Details
-                    <ExternalLink className="ml-1 h-3 w-3" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+ {/* Search and Filters */}
+ <div className="flex flex-col gap-3 mb-6">
+ <div className="relative w-full">
+ <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+ <Input
+ placeholder="Search by token or pool address..."
+ className="pl-10 bg-gray-900/50 border-gray-800 text-white placeholder-gray-400 h-12 text-sm w-full"
+ value={searchQuery}
+ onChange={(e) => setSearchQuery(e.target.value)}
+ />
+ </div>
+ <div className="flex items-center gap-3">
+ <DropdownMenu>
+ <DropdownMenuTrigger asChild>
+ <Button
+ variant="outline"
+ className="flex-1 border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
+ >
+ Sort by: {sortBy.field.charAt(0).toUpperCase() + sortBy.field.slice(1)}
+ <ChevronDown className="ml-2 h-5 w-5" />
+ </Button>
+ </DropdownMenuTrigger>
+ <DropdownMenuContent className="bg-gray-900 border-gray-800 text-white w-full">
+ <DropdownMenuItem onClick={() => handleSort("volume")} className="text-sm py-2">
+ Volume
+ </DropdownMenuItem>
+ <DropdownMenuItem onClick={() => handleSort("trades")} className="text-sm py-2">
+ Trades
+ </DropdownMenuItem>
+ <DropdownMenuItem onClick={() => handleSort("age")} className="text-sm py-2">
+ Age
+ </DropdownMenuItem>
+ </DropdownMenuContent>
+ </DropdownMenu>
+ <Drawer>
+ <DrawerTrigger asChild>
+ <Button
+ variant="outline"
+ className="flex-1 border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-12 text-sm"
+ >
+ Filters
+ </Button>
+ </DrawerTrigger>
+ <DrawerContent className="bg-gray-900 text-white">
+ <div className="mx-auto w-full max-w-sm">
+ <DrawerHeader>
+ <DrawerTitle className="text-white">Filter Options</DrawerTitle>
+ <DrawerDescription className="text-gray-400">
+ Customize your dashboard view
+ </DrawerDescription>
+ </DrawerHeader>
+ <div className="p-4 pb-0">
+ <div className="space-y-4">
+ <div className="space-y-2">
+ <h4 className="text-sm font-medium text-gray-300">Minimum Volume</h4>
+ <Input
+ type="number"
+ placeholder="0"
+ className="bg-gray-900/50 border-gray-800 text-white h-12 text-sm"
+ />
+ </div>
+ <div className="space-y-2">
+ <h4 className="text-sm font-medium text-gray-300">Pool Age</h4>
+ <div className="grid grid-cols-2 gap-2">
+ <Button
+ variant="outline"
+ size="sm"
+ className="border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-10 text-sm"
+ >
+ All Time
+ </Button>
+ <Button
+ variant="outline"
+ size="sm"
+ className="border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-10 text-sm"
+ >
+ Last 7 Days
+ </Button>
+ <Button
+ variant="outline"
+ size="sm"
+ className="border-gray-800 bg-gray-900/50 text-white hover:bg-gray-800 h-10 text-sm"
+ >
+ Last 30 Days
+ </Button>
+ <Button
+ variant="outline"
+ size="sm"
+ className="border-gray-800 bg-gray-800 text-white hover:bg-gray-800 h-10 text-sm"
+ >
+ Last 90 Days
+ </Button>
+ </div>
+ </div>
+ <div className="flex items-center justify-between">
+ <span className="text-sm text-gray-300">Show Advanced Metrics</span>
+ <Switch checked={showAdvanced} onCheckedChange={setShowAdvanced} />
+ </div>
+ </div>
+ </div>
+ <DrawerFooter>
+ <Button className="bg-purple-600 hover:bg-purple-700 h-12 text-sm">
+ Apply Filters
+ </Button>
+ <DrawerClose asChild>
+ <Button
+ variant="outline"
+ className="border-gray-800 bg-gray-900/50 text-white h-12 text-sm"
+ >
+ Cancel
+ </Button>
+ </DrawerClose>
+ </DrawerFooter>
+ </div>
+ </DrawerContent>
+ </Drawer>
+ </div>
+ </div>
+
+ {/* Pool Cards Grid */}
+ <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+ {isLoading || paginatedPools.length === 0
+ ? Array.from({ length: poolsPerPage }).map((_, index) => (
+ <PoolCardSkeleton key={index} isDarkMode={true} />
+ ))
+ : paginatedPools.map((pool) => (
+ <PoolCard
+ key={pool.pool_address}
+ pool={{
+ address: shortenAddress(pool.pool_address),
+ token1: shortenAddress(
+ pool.token1 || data.poolDetails[pool.pool_address]?.tokens_info[0]?.token || "Unknown"
+ ),
+ token2: shortenAddress(
+ pool.token2 || data.poolDetails[pool.pool_address]?.tokens_info[1]?.token || "Unknown"
+ ),
+ volume24h: data.poolMetrics[pool.pool_address]?.total_volume_24h || pool.volume_24h,
+ volumeChange: data.poolMetrics[pool.pool_address]?.total_volume_change_24h || 0,
+ trades24h: data.poolMetrics[pool.pool_address]?.total_trades_24h || pool.total_trade_24h || 0,
+ tradesChange: data.poolMetrics[pool.pool_address]?.total_trades_change_24h || 0,
+ createdAt: pool.created_time
+ ? new Date(pool.created_time * 1000).toISOString()
+ : new Date().toISOString(),
+ lpToken: shortenAddress(data.poolDetails[pool.pool_address]?.lp_token) || "Unknown",
+ creator: shortenAddress(data.poolDetails[pool.pool_address]?.creator) || "Unknown",
+ }}
+ isDarkMode={true}
+ onClick={() => setSelectedPool(pool.pool_address)}
+ isSelected={selectedPool === pool.pool_address}
+ />
+ ))}
+ </div>
+
+ {page * poolsPerPage < sortedPools.length && (
+ <div className="text-center mb-8">
+ <Button
+ onClick={loadMore}
+ disabled={isLoading || isLoadingMore}
+ className="bg-purple-600 hover:bg-purple-700 h-12 text-sm px-6"
+ >
+ {isLoadingMore ? (
+ <span className="flex items-center">
+ <svg
+ className="animate-spin h-5 w-5 mr-2 text-white"
+ xmlns="http://www.w3.org/2000/svg"
+ fill="none"
+ viewBox="0 0 24 24"
+ >
+ <circle
+ className="opacity-25"
+ cx="12"
+ cy="12"
+ r="10"
+ stroke="currentColor"
+ strokeWidth="4"
+ ></circle>
+ <path
+ className="opacity-75"
+ fill="currentColor"
+ d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+ ></path>
+ </svg>
+ Loading...
+ </span>
+ ) : (
+ "Load More"
+ )}
+ </Button>
+ </div>
+ )}
+
+ {/* Pool-Specific Chart */}
+ {selectedPoolData && (
+ <div className="mb-8">
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader>
+ <div className="flex flex-col gap-3">
+ <div>
+ <CardTitle className="text-lg text-white truncate">
+ {getPoolName(selectedPoolData.pool, selectedPoolData.details)} Metrics Over Time
+ </CardTitle>
+ <CardDescription className="text-gray-400 text-sm">
+ Historical data for{" "}
+ {getPoolName(selectedPoolData.pool, selectedPoolData.details)}
+ </CardDescription>
+ </div>
+ <Tabs
+ value={chartMetric}
+ onValueChange={(value) => setChartMetric(value as "volume" | "trades")}
+ className="w-full"
+ >
+ <TabsList className="bg-gray-800 w-full grid grid-cols-2">
+ <TabsTrigger
+ value="volume"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ Volume
+ </TabsTrigger>
+ <TabsTrigger
+ value="trades"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ Trades
+ </TabsTrigger>
+ </TabsList>
+ </Tabs>
+ </div>
+ </CardHeader>
+ <CardContent className="p-2 sm:p-4">
+ <div className="overflow-x-auto">
+ <div className="w-full min-w-[300px]">
+ <PoolMetricsChart data={chartData} isDarkMode={true} />
+ </div>
+ </div>
+ </CardContent>
+ </Card>
+ </div>
+ )}
+
+ {/* Alerts Section */}
+ <div className="mb-8">
+ <div className="flex flex-col gap-3 mb-4">
+ <h2 className="text-lg font-bold text-white">Alerts & Notifications</h2>
+ <Tabs defaultValue="all" value={alertFilter} onValueChange={setAlertFilter} className="w-full">
+ <TabsList className="bg-gray-800 w-full grid grid-cols-4">
+ <TabsTrigger
+ value="all"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ All
+ </TabsTrigger>
+ <TabsTrigger
+ value="high"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ High
+ </TabsTrigger>
+ <TabsTrigger
+ value="medium"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ Medium
+ </TabsTrigger>
+ <TabsTrigger
+ value="low"
+ className="data-[state=active]:bg-purple-600 text-gray-200 text-sm py-2"
+ >
+ Low
+ </TabsTrigger>
+ </TabsList>
+ </Tabs>
+ </div>
+ <div className="overflow-x-auto">
+ <table className="w-full">
+ <thead> 
+ <tr className="border-b border-gray-800 bg-gray-900/80 text-left text-xs font-medium uppercase tracking-wider text-gray-400">
+ <th className="whitespace-nowrap px-3 py-2">Time</th>
+ <th className="whitespace-nowrap px-3 py-2">Alert</th>
+ {!isMobile && <th className="whitespace-nowrap px-3 py-2">Pool</th>}
+ <th className="whitespace-nowrap px-3 py-2">Severity</th>
+ <th className="whitespace-nowrap px-3 py-2"></th>
+ </tr>
+ </thead>
+ <tbody className="divide-y divide-gray-800">
+ {filteredAlerts.map((alert, index) => (
+ <tr
+ key={index}
+ className="text-sm transition-colors bg-gray-900/30 text-gray-300 hover:bg-gray-800/50"
+ >
+ <td className="whitespace-nowrap px-3 py-2">{formatTime(alert.time)}</td>
+ <td className="px-3 py-2">
+ <div className="flex items-center gap-2">
+ <AlertCircle
+ className={`h-4 w-4 ${
+ alert.severity === "High"
+ ? "text-red-500"
+ : alert.severity === "Medium"
+ ? "text-amber-500"
+ : "text-cyan-500"
+ }`}
+ />
+ <span className="font-medium text-white truncate">{alert.message}</span>
+ </div>
+ </td>
+ {!isMobile && (
+ <td className="px-3 py-2">
+ <div className="flex items-center gap-2">
+ <Wallet className="h-4 w-4 text-purple-500" />
+ <span className="truncate">{alert.pool}</span>
+ </div>
+ </td>
+ )}
+ <td className="whitespace-nowrap px-3 py-2">
+ <Badge
+ variant="outline"
+ className={
+ alert.severity === "High"
+ ? "border-red-500 text-red-400 bg-red-950/30"
+ : alert.severity === "Medium"
+ ? "border-amber-500 text-amber-400 bg-amber-950/30"
+ : "border-cyan-500 text-cyan-400 bg-cyan-950/30"
+ }
+ >
+ {alert.severity}
+ </Badge>
+ </td>
+ <td className="whitespace-nowrap px-3 py-2 text-right">
+ <Button
+ variant="ghost"
+ size="sm"
+ className="text-xs text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
+ >
+ View Details
+ <ExternalLink className="ml-1 h-3 w-3" />
+ </Button>
+ </td>
+ </tr>
+ ))}
+ </tbody>
+ </table>
+ </div>
+ </div>
+
+ {/* Configure Alerts Section */}
+ <Card className="border-gray-800 bg-gray-900/50 shadow-lg">
+ <CardHeader>
+ <CardTitle className="text-lg text-white">
+ <div className="flex items-center">
+ <Bell className="mr-2 h-5 w-5 text-purple-500" />
+ Configure Alerts
+ </div>
+ </CardTitle>
+ <CardDescription className="text-gray-400 text-sm">
+ Set up notifications for important pool events
+ </CardDescription>
+ </CardHeader>
+ <CardContent>
+ <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+ <div className="p-4 rounded-xl bg-gray-800">
+ <h3 className="font-medium mb-2 text-white text-sm">Price Alerts</h3>
+ <div className="space-y-3">
+ <div className="flex items-center justify-between">
+ <span className="text-gray-300 text-sm">SOL price change (±5%)</span>
+ <Switch />
+ </div>
+ <div className="flex items-center justify-between">
+ <span className="text-gray-300 text-sm">USDC price change (±1%)</span>
+ <Switch defaultChecked />
+ </div>
+ </div>
+ </div>
+ <div className="p-4 rounded-xl bg-gray-800">
+ <h3 className="font-medium mb-2 text-white text-sm">Volume Alerts</h3>
+ <div className="space-y-3">
+ <div className="flex items-center justify-between">
+ <span className="text-gray-300 text-sm">Volume spike ({">"}50%)</span>
+ <Switch defaultChecked />
+ </div>
+ <div className="flex items-center justify-between">
+ <span className="text-gray-300 text-sm">Volume drop ({">"}30%)</span>
+ <Switch />
+ </div>
+ </div>
+ </div>
+ </div>
+ <Separator className="my-4 bg-gray-800" />
+ <div className="flex justify-end">
+ <Button className="bg-purple-600 hover:bg-purple-700 h-12 text-sm px-6">
+ Save Alert Preferences
+ </Button>
+ </div>
+ </CardContent>
+ </Card>
+ </div>
+ );
 }
