@@ -124,3 +124,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to fetch Solscan data', details: err.message }, { status: 500 });
     }
 }
+
+// (Optional) GET handler to fetch current tracked wallets
+export async function GET() {
+    return NextResponse.json({ trackedWallets });
+}
