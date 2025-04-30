@@ -134,9 +134,8 @@ export default function DashboardPage() {
  setError(null);
  try {
  const response = await axios({
- method: isRefresh ? "POST" : "GET",
+ method:"POST" ,
  url: "/api/fetch-dex-data",
- headers: { "x-api-key": process.env.NEXT_PUBLIC_API_KEY || "your_secret_key" },
  });
  if (response.data.success) {
  setData(response.data.data);
@@ -273,6 +272,8 @@ export default function DashboardPage() {
  if (!selectedPool) return null;
  const pool = data.topPools.find((p) => p.pool_address === selectedPool);
  if (!pool) return null;
+ console.log("Selected Pool:", pool);
+ console.log("PoolMetrics", data.poolMetrics[pool.pool_address].days);
  return {
  pool,
  details: data.poolDetails[pool.pool_address] || {

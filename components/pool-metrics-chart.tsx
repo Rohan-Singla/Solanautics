@@ -21,6 +21,7 @@ interface PoolMetricsChartProps {
 }
 
 export function PoolMetricsChart({ data, isDarkMode }: PoolMetricsChartProps) {
+  console.log("Data for chart:", data); // Log the data to check its structure
   const isMobile = useMobile();
 
   // Format date for X-axis (e.g., "Mar 1")

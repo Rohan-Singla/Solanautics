@@ -47,6 +47,7 @@ const fetchAllData = async () => {
           console.log(`Fetched metrics for pool ${pool.pool_address}:`, metrics);
           poolDetails[pool.pool_address] = details.data;
           poolMetrics[pool.pool_address] = metrics.data;
+          console.log("pool day data ", metrics.data.days);
         } catch (error) {
           console.error(
             `Error fetching details for pool ${pool.pool_address}:`,
