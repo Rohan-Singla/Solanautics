@@ -22,22 +22,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-//   useEffect(() => {
-//     const fetchWhales = async () => {
-//       try {
-//         setLoading(true)
-//         const res = await axios.get('/api/whales')
-//         setWhales(res.data)
-//       } catch (err) {
-//         console.error('Error fetching whales:', err)
-//         setError('Failed to load whale data')
-//       } finally {
-//         setLoading(false)
-//       }
-//     }
-//     fetchWhales()
-//   }, [])
-
   const renderDefaultContent = () => {
     if (loading) {
       return <div className="text-white">Loading...</div>
