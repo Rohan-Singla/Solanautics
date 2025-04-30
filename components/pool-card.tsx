@@ -27,8 +27,14 @@ interface PoolCardProps {
   onClick: () => void;
   isSelected: boolean;
 }
-
 export function PoolCard({ pool, isDarkMode, onClick, isSelected }: PoolCardProps) {
+  // Enhanced shorten address function
+const shortenAddress = (address: string | undefined) => {
+  if (!address || typeof address !== "string") return "N/A";
+  if (address.length <= 10) return address;
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
+  console.log("Pool Card Data:", pool.token1); // Log the pool data to check its structure
   const timeAgo = (date: string) => {
     const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
 
@@ -60,7 +66,16 @@ export function PoolCard({ pool, isDarkMode, onClick, isSelected }: PoolCardProp
     }
     return `$${volume.toFixed(2)}`;
   };
-
+  const copyToClipboard = async (e: React.MouseEvent, text: string) => {
+    e.stopPropagation(); // prevent triggering card click
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Copied to clipboard!");
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
+  };
+  
   return (
     <Card
       className={`cursor-pointer transition-all w-full ${
@@ -70,22 +85,33 @@ export function PoolCard({ pool, isDarkMode, onClick, isSelected }: PoolCardProp
     >
       <CardHeader className="pb-2 px-4 pt-4">
         <div className="flex justify-between items-start">
-          <CardTitle className={`text-base sm:text-lg truncate ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-            {pool.token1}/{pool.token2}
-          </CardTitle>
+        <CardTitle className={`text-base sm:text-lg truncate flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+  <div className="flex items-center gap-1">
+    
+    <button
+      onClick={(e) => copyToClipboard(e, pool.token1)}
+      className="text-xs text-gray-400 hover:text-purple-500 hover:pointer"
+      title="Copy token1 address"
+    >
+      <span>{shortenAddress(pool.token1)}</span>
+    </button>
+  </div>
+  <span>/</span>
+  <div className="flex items-center gap-1">
+    
+    <button
+      onClick={(e) => copyToClipboard(e, pool.token2)}
+      className="text-xs text-gray-400 hover:text-purple-500"
+      title="Copy token2 address"
+    >
+      <span>{shortenAddress(pool.token2)}</span>
+    </button>
+  </div>
+</CardTitle>
+
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 p-2"
-                  onClick={(e) => e.stopPropagation()} // Prevent card click when clicking the button
-                >
-                  <Bell className={`h-5 w-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
-                  <span className="sr-only">Set alert</span>
-                </Button>
-              </TooltipTrigger>
+      
               <TooltipContent className={isDarkMode ? "bg-gray-800 text-white border-gray-700" : "bg-white text-gray-900 border-gray-200"}>
                 <p className="text-sm">Set price/volume alert</p>
               </TooltipContent>

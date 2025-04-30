@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PoolInfo {
+  id               String  @id @default(cuid())
+  volume_24h       Float
+  pool_address     String  @unique
+  program_id       String
+  token1           String?
+  token1_account   String?
+  token2           String?
+  token2_account   String?
+  total_volume_24h Float?
+  total_trade_24h  Float?
+  created_time     BigInt?
+
+  // Relations
+  details PoolDetails?  @relation("PoolDetailsToPoolInfo")
+  metrics PoolMetrics[]
+}
+
+model PoolDetails {
+  id                String @id @default(cuid())
+  pool_address      String @unique
+  program_id        String
+  create_tx_hash    String
+  create_block_time BigInt
+  creator           String
+  lp_token          String
+
+  tokens_info TokenInfo[]
+
+  // Relations
+  pool PoolInfo @relation("PoolDetailsToPoolInfo", fields: [pool_address], references: [pool_address])
+}
+
+model TokenInfo {
+  id            String @id @default(cuid())
+  token         String
+  token_account String
+  amount        Float
+
+  poolDetailsId String
+  poolDetails   PoolDetails @relation(fields: [poolDetailsId], references: [id])
+}
+
+model PoolMetrics {
+  id                      String @id @default(cuid())
+  pool_address            String
+  program_id              String
+  total_volume_24h        Float
+  total_volume_change_24h Float
+  total_trades_24h        Float
+  total_trades_change_24h Float
+
+  poolInfoId String?
+  poolInfo   PoolInfo? @relation(fields: [poolInfoId], references: [id])
+
+  days MetricDay[]
+}
+
+model MetricDay {
+  id    String @id @default(cuid())
+  day   Int
+  value Float
+
+  poolMetricsId String
+  poolMetrics   PoolMetrics @relation(fields: [poolMetricsId], references: [id])
+}

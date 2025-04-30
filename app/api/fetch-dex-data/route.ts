@@ -84,18 +84,7 @@ const startCronJob = () => {
 startCronJob();
 
 // 👇 Named exports required
-export async function GET(req: NextRequest) {
-  try {
-    console.log('Handling GET request, returning cached data:', dexDataCache);
-    return Response.json({
-      success: true,
-      data: dexDataCache,
-    });
-  } catch (error) {
-    console.error('Error in GET handler:', error);
-    return new Response('Failed to fetch Solana DEX data', { status: 500 });
-  }
-}
+
 
 export async function POST(req: NextRequest) {
   try {
