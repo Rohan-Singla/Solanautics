@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# APTURA
 
-## Getting Started
+Solanautics is an tool built using Solscan which helps you stay updated , track wallets , smart money tracking , price alerts
 
-First, run the development server:
+## 🌟 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Core Capabilities
+- **Wallet Tracking** - Add wallets and track their transactions
+- **Price** - Get various price alerts on solana , volatility,price,price ranges
+- **Liquidity Pools Tracking** - Tracks Top pools and notifies make you aware of opportunities and risks
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Technology Stack
+- Solscan API - Uses Solscan API to fetch and filter the data
+- Telegram Bot API - Uses telegram bot API to give price alerts
+- Cron jobs  - Uses cron jobs to re fetch the data to have update and latest data
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👥 Team
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Sumaiya Shaik** - [LinkedIN](https://www.linkedin.com/in/shaik-sumiyas/)
+- **Vishesh Dwivedi** - [LinkedIN](https://www.linkedin.com/in/vishesh-dwivedi-567426275/)
+- **Rohan Singla** - [@rohanBuilds](https://twitter.com/rohanBuilds)
 
-## Learn More
+## 🏆 Hackathon
 
-To learn more about Next.js, take a look at the following resources:
+Solanautics was developed as part of the Redacted Hackathon.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is licensed under the [MIT License](LICENSE).
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
