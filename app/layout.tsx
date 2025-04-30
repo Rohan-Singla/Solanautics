@@ -4,7 +4,9 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Poppins({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"]
+  subsets: ['latin'],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  preload: true,
 });
 
 

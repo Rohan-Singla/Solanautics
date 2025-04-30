@@ -174,11 +174,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://Solanautics_owner:npg_uPG62FdDzecl@ep-restless-cake-a4h3xk3n-pooler.us-east-1.aws.neon.tech/Solanautics?sslmode=require"
+        "value": null
       }
     }
   },
